@@ -136,12 +136,12 @@ export function ArticleEditor({ article }: ArticleEditorProps) {
     }
   }
 
-  const handlePreview = () => {
-    toast({
-      title: "Preview",
-      description: "Preview functionality would open here",
-    })
-  }
+  // const handlePreview = () => {
+  //   toast({
+  //     title: "Preview",
+  //     description: "Preview functionality would open here",
+  //   })
+  // }
 
   return (
     <div className="min-h-screen">
@@ -163,10 +163,10 @@ export function ArticleEditor({ article }: ArticleEditorProps) {
             </div>
           </div>
           <div className="flex gap-3">
-            <Button variant="outline" onClick={handlePreview} className="bg-white/50 backdrop-blur-sm border-white/20">
+            {/* <Button variant="outline" onClick={handlePreview} className="bg-white/50 backdrop-blur-sm border-white/20">
               <Eye className="h-4 w-4 mr-2" />
               Preview
-            </Button>
+            </Button> */}
             <Button
               form="article-form"
               type="submit"
