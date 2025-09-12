@@ -37,12 +37,26 @@ export interface Article {
 class GitHubService {
   private config: GitHubConfig = {
     owner: "ranzosap",
-    repo: "ranjansapkota.github.io",
+    repo: "ranjan.sapkota",
   }
 
   private getAuthHeaders() {
     const token =
       process.env.GITHUB_TOKEN || (typeof window !== "undefined" ? localStorage.getItem("github_token") : null)
+
+    console.log("[v0] GitHub token check:", {
+      hasEnvToken: !!process.env.GITHUB_TOKEN,
+      hasLocalStorageToken: typeof window !== "undefined" ? !!localStorage.getItem("github_token") : false,
+      tokenLength: token ? token.length : 0,
+      tokenPrefix: token ? token.substring(0, 4) + "..." : "none",
+    })
+
+    if (!token) {
+      console.error(
+        "[v0] No GitHub token found! Please set GITHUB_TOKEN environment variable or add token to localStorage",
+      )
+    }
+
     return {
       Authorization: `token ${token}`,
       "Content-Type": "application/json",
@@ -52,7 +66,22 @@ class GitHubService {
 
   async createOrUpdateFile(file: GitHubFile): Promise<boolean> {
     try {
+      const token =
+        process.env.GITHUB_TOKEN || (typeof window !== "undefined" ? localStorage.getItem("github_token") : null)
+      if (!token) {
+        console.error("[v0] Cannot sync to GitHub: No authentication token provided")
+        console.log("[v0] Please add your GitHub token to continue with GitHub sync")
+        return false
+      }
+
       const url = `https://api.github.com/repos/${this.config.owner}/${this.config.repo}/contents/${file.path}`
+
+      console.log("[v0] Attempting to sync to GitHub:", {
+        owner: this.config.owner,
+        repo: this.config.repo,
+        path: file.path,
+        url: url,
+      })
 
       // First, try to get the existing file to get its SHA
       let existingSha: string | undefined
@@ -80,7 +109,19 @@ class GitHubService {
 
       if (!response.ok) {
         const errorData = await response.json()
-        console.error("[v0] GitHub API error:", errorData)
+        console.error("[v0] GitHub API error:", {
+          status: response.status,
+          statusText: response.statusText,
+          error: errorData,
+          url: url,
+        })
+
+        if (response.status === 401) {
+          console.error("[v0] Authentication failed - check your GitHub token permissions")
+        } else if (response.status === 404) {
+          console.error("[v0] Repository not found - check owner/repo names")
+        }
+
         return false
       }
 
@@ -89,7 +130,7 @@ class GitHubService {
     } catch (error) {
       console.error("[v0] GitHub API error:", error)
       console.log("[v0] Falling back to localStorage storage")
-      return true // Return true to continue with localStorage functionality
+      return false // Return false instead of true to properly indicate failure
     }
   }
 

@@ -160,7 +160,7 @@ export default function AdminDashboard() {
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen dark:from-gray-900 dark:via-blue-900/20 dark:to-indigo-900/20">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-900 dark:via-blue-900/20 dark:to-indigo-900/20">
         <div className="container mx-auto px-4 py-8 max-w-[1600px]">
           {/* Header */}
           <div className="mb-8">
@@ -191,6 +191,11 @@ export default function AdminDashboard() {
               </div>
             </div>
           </div>
+
+          {/* GitHub Integration Setup section */}
+          {/* <div className="mb-8">
+            <GitHubTokenSetup />
+          </div> */}
 
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
@@ -268,7 +273,12 @@ export default function AdminDashboard() {
                         </span>
                         <span className="flex items-center gap-1">
                           <Eye className="h-4 w-4" />
-                          {analytics.getArticleViews(article.slug)} views
+                          {(() => {
+                            console.log("[v0] Admin dashboard - article slug:", article.slug)
+                            const views = analytics.getArticleViews(article.slug)
+                            console.log("[v0] Admin dashboard - views for slug:", views)
+                            return views
+                          })()} views
                         </span>
                         <div className="flex gap-1">
                           {article.tags.slice(0, 3).map((tag) => (
