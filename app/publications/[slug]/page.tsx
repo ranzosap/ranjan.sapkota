@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: ArticlePageProps) {
 
   if (!article) {
     return {
-      title: "Article Not Found",
+      title: "Portfolio",
     }
   }
 
