@@ -40,7 +40,7 @@ export default function ArticlePageClient({ params }: ArticlePageProps) {
         const updatedArticles = articles.map((article: any) => ({
           ...article,
           authors: article.authors.map((author: string) =>
-            author === "Dr. Academic Researcher" ? "Ranjan Sapkota" : author,
+            author === "Ranjan Researcher" ? "Ranjan Sapkota" : author,
           ),
         }))
         localStorage.setItem("userArticles", JSON.stringify(updatedArticles))

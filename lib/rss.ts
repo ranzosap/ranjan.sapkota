@@ -33,7 +33,7 @@ export function generateRSSFeed(baseUrl: string): string {
   const rssContent = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>Dr. Academic Portfolio - Publications</title>
+    <title>Ranjan Portfolio - Publications</title>
     <description>Latest research publications and academic work</description>
     <link>${baseUrl}</link>
     <language>en-us</language>
