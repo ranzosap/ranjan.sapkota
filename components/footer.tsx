@@ -78,8 +78,7 @@ export function Footer() {
 
         <div className="mt-8 lg:mt-12 pt-8 border-t border-border/30 text-center">
           <p className="text-sm text-muted-foreground">
-            &copy; {new Date().getFullYear()} Ranjan Sapkota. All rights reserved. Built with Next.js and modern web
-            technologies.
+            &copy; {new Date().getFullYear()} Ranjan Sapkota. All rights reserved. Built by Suraj Chaudhary
           </p>
         </div>
       </div>

@@ -67,11 +67,18 @@ export default function AdminDashboard() {
     return () => clearInterval(interval)
   }, [refreshKey])
 
-  const filteredArticles = allArticles.filter(
+  // const filteredArticles = allArticles.filter(
+  //   (article) =>
+  //     article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+  //     article.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase())),
+  // )
+  const filteredArticles = allArticles
+  .filter(
     (article) =>
       article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
       article.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase())),
   )
+  .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
 
   const totalPages = Math.ceil(filteredArticles.length / articlesPerPage)
   const startIndex = (currentPage - 1) * articlesPerPage

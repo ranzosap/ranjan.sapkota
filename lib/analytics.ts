@@ -17,22 +17,49 @@ class AnalyticsService {
   private storageKey = "portfolio-analytics"
   private visitorKey = "portfolio-visitor-id"
 
+  private isClient(): boolean {
+    return typeof window !== "undefined"
+  }
+
   private getVisitorId(): string {
+    if (!this.isClient()) return "server-visitor"
+
     let visitorId = localStorage.getItem(this.visitorKey)
     if (!visitorId) {
-      visitorId = `visitor_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+      visitorId = `visitor_${Date.now()}_${Math.random().toString(36).substring(2, 11)}`
       localStorage.setItem(this.visitorKey, visitorId)
     }
     return visitorId
   }
 
   private getAnalyticsData(): AnalyticsData {
+    if (!this.isClient()) {
+      return {
+        totalViews: 0,
+        articleViews: {},
+        visitors: new Set(),
+        citations: 0,
+        lastUpdated: new Date().toISOString(),
+      }
+    }
+
     const stored = localStorage.getItem(this.storageKey)
     if (stored) {
-      const data = JSON.parse(stored)
-      // Convert visitors array back to Set
-      data.visitors = new Set(data.visitors || [])
-      return data
+      try {
+        const data = JSON.parse(stored)
+        data.visitors = new Set(data.visitors || [])
+        return data
+      } catch (err) {
+        console.warn("[Analytics] Failed to parse analytics data:", err)
+        // Reset corrupted data
+        return {
+          totalViews: 0,
+          articleViews: {},
+          visitors: new Set(),
+          citations: 0,
+          lastUpdated: new Date().toISOString(),
+        }
+      }
     }
 
     return {
@@ -45,7 +72,8 @@ class AnalyticsService {
   }
 
   private saveAnalyticsData(data: AnalyticsData): void {
-    // Convert Set to array for storage
+    if (!this.isClient()) return
+
     const toStore = {
       ...data,
       visitors: Array.from(data.visitors),
@@ -55,28 +83,28 @@ class AnalyticsService {
   }
 
   trackPageView(path: string): void {
+    if (!this.isClient()) return
+
     const visitorId = this.getVisitorId()
     const data = this.getAnalyticsData()
 
-    // Increment total views
     data.totalViews++
-
-    // Add visitor to set (automatically handles uniqueness)
     data.visitors.add(visitorId)
 
-    // Track article-specific views
+    // Normalize slug (remove /publications/ prefix and trailing slash)
     if (path.startsWith("/publications/") && path !== "/publications") {
-      const slug = path.replace("/publications/", "")
+      const slug = path.replace(/^\/publications\/|\/$/g, "")
       data.articleViews[slug] = (data.articleViews[slug] || 0) + 1
     }
 
     this.saveAnalyticsData(data)
 
-    // Log page view for debugging
-    console.log("[v0] Page view tracked:", { path, visitorId, totalViews: data.totalViews })
+    console.log("[Analytics] Page view tracked:", { path, visitorId, totalViews: data.totalViews })
   }
 
   trackCitation(): void {
+    if (!this.isClient()) return
+
     const data = this.getAnalyticsData()
     data.citations++
     this.saveAnalyticsData(data)
@@ -93,17 +121,16 @@ class AnalyticsService {
     }
   }
 
-  // Method to get views for a specific article
   getArticleViews(slug: string): number {
     const data = this.getAnalyticsData()
-    console.log("[v0] Getting article views for slug:", slug)
-    console.log("[v0] Available article views:", data.articleViews)
-    console.log("[v0] Views for this slug:", data.articleViews[slug] || 0)
-    return data.articleViews[slug] || 0
+    const views = data.articleViews[slug] || 0
+    console.log("[Analytics] Views for slug:", slug, views)
+    return views
   }
 
-  // Reset analytics (for testing purposes)
   resetAnalytics(): void {
+    if (!this.isClient()) return
+
     localStorage.removeItem(this.storageKey)
     localStorage.removeItem(this.visitorKey)
   }

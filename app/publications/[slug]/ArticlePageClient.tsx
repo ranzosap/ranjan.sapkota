@@ -213,14 +213,14 @@ export default function ArticlePageClient({ params }: ArticlePageProps) {
                   </Button>
                 )}
 
-                {article.github_link && (
+                {/* {article.github_link && (
                   <Button variant="outline" asChild size="sm" className="text-xs md:text-sm bg-transparent">
                     <Link href={article.github_link} target="_blank" rel="noopener noreferrer">
                       <Github className="h-4 w-4 mr-2" />
                       GitHub
                     </Link>
                   </Button>
-                )}
+                )} */}
 
                 <BibtexModal article={article} />
 
