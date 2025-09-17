@@ -126,32 +126,36 @@ class GitHubService {
     try {
       const articles: Article[] = []
 
-      // Get articles from both draft and published folders
-      for (const status of ["draft", "published"]) {
-        const url = `https://api.github.com/repos/${this.config.owner}/${this.config.repo}/contents/articles/${status}`
+      const url = `https://api.github.com/repos/${this.config.owner}/${this.config.repo}/contents/articles/published`
 
-        const response = await fetch(url, {
-          headers: this.getAuthHeaders(),
-        })
+      console.log("[v0] Fetching articles from GitHub:", url)
+      const response = await fetch(url, {
+        headers: this.getAuthHeaders(),
+      })
 
-        if (response.ok) {
-          const files = await response.json()
+      if (response.ok) {
+        const files = await response.json()
+        console.log("[v0] Found files in GitHub:", files.length)
 
-          for (const file of files) {
-            if (file.name.endsWith(".md")) {
-              const contentResponse = await fetch(file.download_url)
-              if (contentResponse.ok) {
-                const content = await contentResponse.text()
-                const article = this.parseMarkdownArticle(content, status === "published")
-                if (article) {
-                  articles.push(article)
-                }
+        for (const file of files) {
+          if (file.name.endsWith(".md")) {
+            console.log("[v0] Processing article file:", file.name)
+            const contentResponse = await fetch(file.download_url)
+            if (contentResponse.ok) {
+              const content = await contentResponse.text()
+              const article = this.parseMarkdownArticle(content, true) // All articles in published folder are published
+              if (article) {
+                articles.push(article)
+                console.log("[v0] Successfully parsed article:", article.title)
               }
             }
           }
         }
+      } else {
+        console.log("[v0] GitHub API response not ok:", response.status, response.statusText)
       }
 
+      console.log("[v0] Total articles fetched from GitHub:", articles.length)
       return articles
     } catch (error) {
       console.error("[v0] Error fetching articles from GitHub:", error)

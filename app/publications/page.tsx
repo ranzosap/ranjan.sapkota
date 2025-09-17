@@ -1,7 +1,13 @@
 "use client"
 
 import { Suspense, useEffect, useState } from "react"
-import { getPublishedArticles, getAllTags, getAllYears, type Article } from "@/lib/mock-data"
+import {
+  getPublishedArticlesWithSync,
+  getAllTags,
+  getAllYears,
+  getPublishedArticles,
+  type Article,
+} from "@/lib/mock-data"
 import { PublicationsClient } from "@/components/publications-client"
 import { Skeleton } from "@/components/ui/skeleton"
 
@@ -31,15 +37,28 @@ export default function PublicationsPage() {
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    const loadArticles = () => {
-      const publishedArticles = getPublishedArticles()
-      const tags = getAllTags()
-      const years = getAllYears()
+    const loadArticles = async () => {
+      try {
+        const publishedArticles = await getPublishedArticlesWithSync()
+        const tags = getAllTags()
+        const years = getAllYears()
 
-      setArticles(publishedArticles)
-      setAllTags(tags)
-      setAllYears(years)
-      setIsLoading(false)
+        setArticles(publishedArticles)
+        setAllTags(tags)
+        setAllYears(years)
+        setIsLoading(false)
+      } catch (error) {
+        console.error("[v0] Error loading articles:", error)
+        // Fallback to regular function if sync fails
+        const publishedArticles = getPublishedArticles()
+        const tags = getAllTags()
+        const years = getAllYears()
+
+        setArticles(publishedArticles)
+        setAllTags(tags)
+        setAllYears(years)
+        setIsLoading(false)
+      }
     }
 
     loadArticles()
@@ -47,7 +66,7 @@ export default function PublicationsPage() {
 
   if (isLoading) {
     return (
-          <div className="min-h-screen dark:from-gray-900 dark:via-gray-800 dark:to-blue-900">
+      <div className="min-h-screen">
         <div className="container mx-auto px-4 py-12 max-w-7xl">
           <div className="space-y-8">
             <div className="text-center space-y-6">
@@ -71,7 +90,7 @@ export default function PublicationsPage() {
   }
 
   return (
-      <div className="min-h-screen dark:from-gray-900 dark:via-gray-800 dark:to-blue-900">
+    <div className="min-h-screen">
       <div className="container mx-auto px-4 py-12 max-w-7xl">
         <div className="space-y-8">
           {/* Enhanced header */}

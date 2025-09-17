@@ -24,7 +24,7 @@ import {
 } from "lucide-react"
 import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
-import { getAllArticles, deleteArticle, updateArticle } from "@/lib/mock-data"
+import { getAllArticlesWithSync, deleteArticle, updateArticle } from "@/lib/mock-data"
 import { useToast } from "@/hooks/use-toast"
 import { analytics } from "@/lib/analytics"
 
@@ -35,6 +35,8 @@ export default function AdminDashboard() {
   const [searchQuery, setSearchQuery] = useState("")
   const [currentPage, setCurrentPage] = useState(1)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [allArticles, setAllArticles] = useState<any[]>([])
+  const [isLoading, setIsLoading] = useState(true)
   const [metrics, setMetrics] = useState({
     totalViews: 0,
     uniqueVisitors: 0,
@@ -43,7 +45,25 @@ export default function AdminDashboard() {
   })
   const articlesPerPage = 6
 
-  const allArticles = getAllArticles()
+  useEffect(() => {
+    const loadArticles = async () => {
+      try {
+        setIsLoading(true)
+        const articles = await getAllArticlesWithSync()
+        setAllArticles(articles)
+      } catch (error) {
+        console.error("[v0] Error loading articles in admin:", error)
+        // Fallback to regular function if sync fails
+        const { getAllArticles } = await import("@/lib/mock-data")
+        const articles = getAllArticles()
+        setAllArticles(articles)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    loadArticles()
+  }, [refreshKey])
 
   useEffect(() => {
     const handleFocus = () => {
@@ -67,18 +87,29 @@ export default function AdminDashboard() {
     return () => clearInterval(interval)
   }, [refreshKey])
 
-  // const filteredArticles = allArticles.filter(
-  //   (article) =>
-  //     article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-  //     article.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase())),
-  // )
   const filteredArticles = allArticles
-  .filter(
-    (article) =>
-      article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      article.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase())),
-  )
-  .sort((a, b) => new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime())
+    .filter(
+      (article) =>
+        article.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        article.tags.some((tag) => tag.toLowerCase().includes(searchQuery.toLowerCase())),
+    )
+    .sort((a, b) => {
+      // Sort by year first (descending)
+      if (a.year !== b.year) {
+        return b.year - a.year
+      }
+      // Then by month if available (descending)
+      const aMonth = a.month || 12
+      const bMonth = b.month || 12
+      if (aMonth !== bMonth) {
+        return bMonth - aMonth
+      }
+      // Finally by creation date if available (descending)
+      if (a.createdAt && b.createdAt) {
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      }
+      return 0
+    })
 
   const totalPages = Math.ceil(filteredArticles.length / articlesPerPage)
   const startIndex = (currentPage - 1) * articlesPerPage
@@ -91,7 +122,6 @@ export default function AdminDashboard() {
   }
 
   const handleDeleteArticle = (articleTitle: string) => {
-    const allArticles = getAllArticles()
     const articleToDelete = allArticles.find((article) => article.title === articleTitle)
 
     if (articleToDelete) {
@@ -164,6 +194,29 @@ export default function AdminDashboard() {
       color: "text-orange-600",
     },
   ]
+
+  if (isLoading) {
+    return (
+      <ProtectedRoute>
+        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 dark:from-gray-900 dark:via-blue-900/20 dark:to-indigo-900/20">
+          <div className="container mx-auto px-4 py-8 max-w-[1600px]">
+            <div className="mb-8">
+              <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Admin Dashboard</h1>
+              <p className="text-gray-600 dark:text-gray-300 mt-1">Loading articles from GitHub...</p>
+            </div>
+            <div className="animate-pulse space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="bg-gray-200 dark:bg-gray-700 h-24 rounded-lg"></div>
+                ))}
+              </div>
+              <div className="bg-gray-200 dark:bg-gray-700 h-96 rounded-lg"></div>
+            </div>
+          </div>
+        </div>
+      </ProtectedRoute>
+    )
+  }
 
   return (
     <ProtectedRoute>
