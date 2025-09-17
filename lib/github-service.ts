@@ -40,97 +40,44 @@ class GitHubService {
     repo: "ranjan.sapkota",
   }
 
-  private getAuthHeaders() {
-    const token =
-      process.env.GITHUB_TOKEN || (typeof window !== "undefined" ? localStorage.getItem("github_token") : null)
+  async createOrUpdateFile(file: GitHubFile): Promise<boolean> {
+    try {
+      console.log("[v0] Syncing to GitHub via server API:", {
+        path: file.path,
+        messageLength: file.message.length,
+        contentLength: file.content.length,
+      })
 
-    console.log("[v0] GitHub token check:", {
-      hasEnvToken: !!process.env.GITHUB_TOKEN,
-      hasLocalStorageToken: typeof window !== "undefined" ? !!localStorage.getItem("github_token") : false,
-      tokenLength: token ? token.length : 0,
-      tokenPrefix: token ? token.substring(0, 4) + "..." : "none",
-    })
+      const response = await fetch("/api/github/sync", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ file }),
+      })
 
-    if (!token) {
-      console.error(
-        "[v0] No GitHub token found! Please set GITHUB_TOKEN environment variable or add token to localStorage",
-      )
-    }
+      const result = await response.json()
 
-    return {
-      Authorization: `token ${token}`,
-      "Content-Type": "application/json",
-      Accept: "application/vnd.github.v3+json",
+      if (!response.ok) {
+        console.error("[v0] GitHub sync failed:", result.error)
+        console.log("[v0] Article updated in GitHub: Failed")
+        return false
+      }
+
+      console.log("[v0] Successfully synced to GitHub via server API")
+      console.log("[v0] Article updated in GitHub: Success")
+      return true
+    } catch (error) {
+      console.error("[v0] GitHub sync error:", error)
+      console.log("[v0] Article updated in GitHub: Failed")
+      return false
     }
   }
 
-  async createOrUpdateFile(file: GitHubFile): Promise<boolean> {
-    try {
-      const token =
-        process.env.GITHUB_TOKEN || (typeof window !== "undefined" ? localStorage.getItem("github_token") : null)
-      if (!token) {
-        console.error("[v0] Cannot sync to GitHub: No authentication token provided")
-        console.log("[v0] Please add your GitHub token to continue with GitHub sync")
-        return false
-      }
-
-      const url = `https://api.github.com/repos/${this.config.owner}/${this.config.repo}/contents/${file.path}`
-
-      console.log("[v0] Attempting to sync to GitHub:", {
-        owner: this.config.owner,
-        repo: this.config.repo,
-        path: file.path,
-        url: url,
-      })
-
-      // First, try to get the existing file to get its SHA
-      let existingSha: string | undefined
-      try {
-        const existingResponse = await fetch(url, {
-          headers: this.getAuthHeaders(),
-        })
-        if (existingResponse.ok) {
-          const existingData = await existingResponse.json()
-          existingSha = existingData.sha
-        }
-      } catch (error) {
-        console.log("[v0] File doesn't exist yet, creating new file")
-      }
-
-      const response = await fetch(url, {
-        method: "PUT",
-        headers: this.getAuthHeaders(),
-        body: JSON.stringify({
-          message: file.message,
-          content: btoa(unescape(encodeURIComponent(file.content))), // Proper UTF-8 encoding
-          sha: existingSha || file.sha,
-        }),
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        console.error("[v0] GitHub API error:", {
-          status: response.status,
-          statusText: response.statusText,
-          error: errorData,
-          url: url,
-        })
-
-        if (response.status === 401) {
-          console.error("[v0] Authentication failed - check your GitHub token permissions")
-        } else if (response.status === 404) {
-          console.error("[v0] Repository not found - check owner/repo names")
-        }
-
-        return false
-      }
-
-      console.log("[v0] Successfully saved to GitHub:", file.path)
-      return true
-    } catch (error) {
-      console.error("[v0] GitHub API error:", error)
-      console.log("[v0] Falling back to localStorage storage")
-      return false // Return false instead of true to properly indicate failure
+  private getAuthHeaders() {
+    // This method is no longer used for client-side calls
+    return {
+      "Content-Type": "application/json",
     }
   }
 
