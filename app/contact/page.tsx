@@ -321,57 +321,6 @@ export default function ContactPage() {
             </CardContent>
           </Card>
         </div>
-
-        {/* Collaboration Interests */}
-        <Card className="backdrop-blur-md bg-card/70 border-border/30 shadow-lg">
-          <CardHeader>
-            <CardTitle>Research Collaboration Interests</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <p className="text-muted-foreground">
-              I am always interested in collaborating on exciting research projects in agricultural robotics and AI
-              automation. I am particularly interested in:
-            </p>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              <div className="space-y-2">
-                <h3 className="font-semibold">Agricultural Robotics</h3>
-                <p className="text-sm text-muted-foreground">
-                  Robotic pollination, pruning, fruit thinning, and precision agriculture systems
-                </p>
-              </div>
-              <div className="space-y-2">
-                <h3 className="font-semibold">Computer Vision</h3>
-                <p className="text-sm text-muted-foreground">
-                  Object detection, fruit counting, crop monitoring, and machine vision applications
-                </p>
-              </div>
-              <div className="space-y-2">
-                <h3 className="font-semibold">AI & Machine Learning</h3>
-                <p className="text-sm text-muted-foreground">
-                  YOLO architectures, multimodal LLMs, and AI applications in agriculture
-                </p>
-              </div>
-              <div className="space-y-2">
-                <h3 className="font-semibold">Industry Partnerships</h3>
-                <p className="text-sm text-muted-foreground">
-                  Applied research, technology transfer, and commercial orchard automation
-                </p>
-              </div>
-              <div className="space-y-2">
-                <h3 className="font-semibold">Conference Speaking</h3>
-                <p className="text-sm text-muted-foreground">
-                  ASABE, IEEE, IFAC conferences, and agricultural technology symposiums
-                </p>
-              </div>
-              <div className="space-y-2">
-                <h3 className="font-semibold">Student Mentoring</h3>
-                <p className="text-sm text-muted-foreground">
-                  Graduate research supervision and undergraduate research opportunities
-                </p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
     </div>
   )
