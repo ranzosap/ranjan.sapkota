@@ -52,7 +52,7 @@ export default function AdminDashboard() {
         const articles = await getAllArticlesWithSync()
         setAllArticles(articles)
       } catch (error) {
-        console.error("[v0] Error loading articles in admin:", error)
+        console.error("Error loading articles in admin:", error)
         // Fallback to regular function if sync fails
         const { getAllArticles } = await import("@/lib/mock-data")
         const articles = getAllArticles()
@@ -334,9 +334,9 @@ export default function AdminDashboard() {
                         <span className="flex items-center gap-1">
                           <Eye className="h-4 w-4" />
                           {(() => {
-                            console.log("[v0] Admin dashboard - article slug:", article.slug)
+                            console.log("Admin dashboard - article slug:", article.slug)
                             const views = analytics.getArticleViews(article.slug)
-                            console.log("[v0] Admin dashboard - views for slug:", views)
+                            console.log("Admin dashboard - views for slug:", views)
                             return views
                           })()} views
                         </span>

@@ -262,7 +262,7 @@ export function saveArticle(article: Omit<Article, "slug" | "url" | "readingTime
         message: `Add new article: ${article.title}`,
       })
       .then((success) => {
-        console.log("[v0] Article saved to GitHub:", success ? "Success" : "Failed")
+        console.log("Article saved to GitHub:", success ? "Success" : "Failed")
       })
   }
 
@@ -306,7 +306,7 @@ export function updateArticle(slug: string, updates: Partial<Article>): Article 
           })
         })
         .then((success) => {
-          console.log("[v0] Article status updated in GitHub:", success ? "Success" : "Failed")
+          console.log("Article status updated in GitHub:", success ? "Success" : "Failed")
         })
     } else {
       // Just update the existing file
@@ -321,7 +321,7 @@ export function updateArticle(slug: string, updates: Partial<Article>): Article 
           message: `Update article: ${updatedArticle.title}`,
         })
         .then((success) => {
-          console.log("[v0] Article updated in GitHub:", success ? "Success" : "Failed")
+          console.log("Article updated in GitHub:", success ? "Success" : "Failed")
         })
     }
   }
@@ -343,7 +343,7 @@ export function deleteArticle(slug: string): boolean {
       const filePath = githubService.getArticlePath(slug, status)
 
       githubService.deleteFile(filePath, `Delete article: ${articleToDelete.title}`, "demo-sha").then((success) => {
-        console.log("[v0] Article deleted from GitHub:", success ? "Success" : "Failed")
+        console.log("Article deleted from GitHub:", success ? "Success" : "Failed")
       })
     }
   }
@@ -383,10 +383,10 @@ export async function syncArticlesFromGitHub(): Promise<void> {
       })
 
       localStorage.setItem("userArticles", JSON.stringify(mergedArticles))
-      console.log("[v0] Synced articles from GitHub:", githubArticles.length)
+      console.log("Synced articles from GitHub:", githubArticles.length)
     }
   } catch (error) {
-    console.error("[v0] Error syncing articles from GitHub:", error)
+    console.error("Error syncing articles from GitHub:", error)
   }
 }
 

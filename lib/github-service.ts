@@ -42,7 +42,7 @@ class GitHubService {
 
   async createOrUpdateFile(file: GitHubFile): Promise<boolean> {
     try {
-      console.log("[v0] Syncing to GitHub via server API:", {
+      console.log("Syncing to GitHub via server API:", {
         path: file.path,
         messageLength: file.message.length,
         contentLength: file.content.length,
@@ -59,17 +59,17 @@ class GitHubService {
       const result = await response.json()
 
       if (!response.ok) {
-        console.error("[v0] GitHub sync failed:", result.error)
-        console.log("[v0] Article updated in GitHub: Failed")
+        console.error("GitHub sync failed:", result.error)
+        console.log("Article updated in GitHub: Failed")
         return false
       }
 
-      console.log("[v0] Successfully synced to GitHub via server API")
-      console.log("[v0] Article updated in GitHub: Success")
+      console.log("Successfully synced to GitHub via server API")
+      console.log("Article updated in GitHub: Success")
       return true
     } catch (error) {
-      console.error("[v0] GitHub sync error:", error)
-      console.log("[v0] Article updated in GitHub: Failed")
+      console.error("GitHub sync error:", error)
+      console.log("Article updated in GitHub: Failed")
       return false
     }
   }
@@ -94,7 +94,7 @@ class GitHubService {
           const fileData = await getResponse.json()
           sha = fileData.sha
         } else {
-          console.log("[v0] File not found in GitHub, skipping delete")
+          console.log("File not found in GitHub, skipping delete")
           return true
         }
       }
@@ -110,14 +110,14 @@ class GitHubService {
 
       if (!response.ok) {
         const errorData = await response.json()
-        console.error("[v0] GitHub delete API error:", errorData)
+        console.error("GitHub delete API error:", errorData)
         return false
       }
 
-      console.log("[v0] Successfully deleted from GitHub:", path)
+      console.log("Successfully deleted from GitHub:", path)
       return true
     } catch (error) {
-      console.error("[v0] GitHub delete API error:", error)
+      console.error("GitHub delete API error:", error)
       return true // Return true to continue with localStorage functionality
     }
   }
@@ -128,37 +128,37 @@ class GitHubService {
 
       const url = `https://api.github.com/repos/${this.config.owner}/${this.config.repo}/contents/articles/published`
 
-      console.log("[v0] Fetching articles from GitHub:", url)
+      console.log("Fetching articles from GitHub:", url)
       const response = await fetch(url, {
         headers: this.getAuthHeaders(),
       })
 
       if (response.ok) {
         const files = await response.json()
-        console.log("[v0] Found files in GitHub:", files.length)
+        console.log("Found files in GitHub:", files.length)
 
         for (const file of files) {
           if (file.name.endsWith(".md")) {
-            console.log("[v0] Processing article file:", file.name)
+            console.log("Processing article file:", file.name)
             const contentResponse = await fetch(file.download_url)
             if (contentResponse.ok) {
               const content = await contentResponse.text()
               const article = this.parseMarkdownArticle(content, true) // All articles in published folder are published
               if (article) {
                 articles.push(article)
-                console.log("[v0] Successfully parsed article:", article.title)
+                console.log("Successfully parsed article:", article.title)
               }
             }
           }
         }
       } else {
-        console.log("[v0] GitHub API response not ok:", response.status, response.statusText)
+        console.log("GitHub API response not ok:", response.status, response.statusText)
       }
 
-      console.log("[v0] Total articles fetched from GitHub:", articles.length)
+      console.log("Total articles fetched from GitHub:", articles.length)
       return articles
     } catch (error) {
-      console.error("[v0] Error fetching articles from GitHub:", error)
+      console.error("Error fetching articles from GitHub:", error)
       return []
     }
   }
@@ -229,7 +229,7 @@ class GitHubService {
         github_link: metadata.github_link || this.generateArticleLink(metadata.title || "untitled"),
       }
     } catch (error) {
-      console.error("[v0] Error parsing markdown article:", error)
+      console.error("Error parsing markdown article:", error)
       return null
     }
   }

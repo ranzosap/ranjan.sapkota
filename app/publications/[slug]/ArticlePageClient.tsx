@@ -26,7 +26,7 @@ interface ArticlePageProps {
 export default function ArticlePageClient({ params }: ArticlePageProps) {
   const { isAuthenticated, isLoading } = useAuth()
 
-  console.log("[v0] Looking for article with slug:", params.slug)
+  console.log("Looking for article with slug:", params.slug)
 
   if (typeof window !== "undefined") {
     const storedArticles = localStorage.getItem("userArticles")
@@ -34,7 +34,7 @@ export default function ArticlePageClient({ params }: ArticlePageProps) {
       try {
         const articles = JSON.parse(storedArticles)
         console.log(
-          "[v0] Found stored articles:",
+          "Found stored articles:",
           articles.map((a: any) => ({ slug: a.slug, published: a.published })),
         )
         const updatedArticles = articles.map((article: any) => ({
@@ -52,15 +52,15 @@ export default function ArticlePageClient({ params }: ArticlePageProps) {
 
   const allArticles = getAllArticles()
   console.log(
-    "[v0] All articles:",
+    "All articles:",
     allArticles.map((a) => ({ slug: a.slug, published: a.published })),
   )
 
   const article = allArticles.find((article) => article.slug === params.slug)
-  console.log("[v0] Found article:", article ? { slug: article.slug, published: article.published } : "not found")
+  console.log("Found article:", article ? { slug: article.slug, published: article.published } : "not found")
 
   if (!article) {
-    console.log("[v0] Article not found, calling notFound()")
+    console.log("Article not found, calling notFound()")
     notFound()
   }
 
@@ -72,7 +72,7 @@ export default function ArticlePageClient({ params }: ArticlePageProps) {
     article.slug.includes("vision-based-robotic")
 
   if (isMockArticle && !article.published) {
-    console.log("[v0] Mock article not published, calling notFound()")
+    console.log("Mock article not published, calling notFound()")
     notFound()
   }
 

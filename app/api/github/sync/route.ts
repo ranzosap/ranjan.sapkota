@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
 
     const token = process.env.GITHUB_TOKEN
     if (!token) {
-      console.error("[v0] No GitHub token found in environment variables")
+      console.error("No GitHub token found in environment variables")
       return NextResponse.json({ success: false, error: "GitHub token not configured" }, { status: 401 })
     }
 
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
     const repo = "ranjan.sapkota"
     const url = `https://api.github.com/repos/${owner}/${repo}/contents/${file.path}`
 
-    console.log("[v0] Server-side GitHub sync:", {
+    console.log("Server-side GitHub sync:", {
       owner,
       repo,
       path: file.path,
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
         existingSha = existingData.sha
       }
     } catch (error) {
-      console.log("[v0] File doesn't exist yet, creating new file")
+      console.log("File doesn't exist yet, creating new file")
     }
 
     const response = await fetch(url, {
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
 
     if (!response.ok) {
       const errorData = await response.json()
-      console.error("[v0] GitHub API error:", {
+      console.error("GitHub API error:", {
         status: response.status,
         statusText: response.statusText,
         error: errorData,
@@ -75,10 +75,10 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    console.log("[v0] Successfully saved to GitHub:", file.path)
+    console.log("Successfully saved to GitHub:", file.path)
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("[v0] Server GitHub API error:", error)
+    console.error("Server GitHub API error:", error)
     return NextResponse.json({ success: false, error: "Internal server error" }, { status: 500 })
   }
 }

@@ -16,14 +16,14 @@ export function GitHubTokenSetup() {
       localStorage.setItem("github_token", token.trim())
       setIsStored(true)
       setToken("")
-      console.log("[v0] GitHub token saved to localStorage")
+      console.log("GitHub token saved to localStorage")
     }
   }
 
   const handleRemoveToken = () => {
     localStorage.removeItem("github_token")
     setIsStored(false)
-    console.log("[v0] GitHub token removed from localStorage")
+    console.log("GitHub token removed from localStorage")
   }
 
   const hasStoredToken = typeof window !== "undefined" && localStorage.getItem("github_token")

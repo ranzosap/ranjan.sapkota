@@ -48,7 +48,7 @@ export default function PublicationsPage() {
         setAllYears(years)
         setIsLoading(false)
       } catch (error) {
-        console.error("[v0] Error loading articles:", error)
+        console.error("Error loading articles:", error)
         // Fallback to regular function if sync fails
         const publishedArticles = getPublishedArticles()
         const tags = getAllTags()
