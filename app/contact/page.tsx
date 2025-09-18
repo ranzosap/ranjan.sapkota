@@ -227,7 +227,7 @@ export default function ContactPage() {
                     <Label htmlFor="firstName">First Name</Label>
                     <Input
                       id="firstName"
-                      placeholder="John"
+                      placeholder=""
                       className="backdrop-blur-sm bg-background/50"
                       value={formData.firstName}
                       onChange={handleInputChange}
@@ -238,7 +238,7 @@ export default function ContactPage() {
                     <Label htmlFor="lastName">Last Name</Label>
                     <Input
                       id="lastName"
-                      placeholder="Doe"
+                      placeholder=""
                       className="backdrop-blur-sm bg-background/50"
                       value={formData.lastName}
                       onChange={handleInputChange}
@@ -252,7 +252,7 @@ export default function ContactPage() {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="john.doe@example.com"
+                    placeholder="Your email address..."
                     className="backdrop-blur-sm bg-background/50"
                     value={formData.email}
                     onChange={handleInputChange}
@@ -264,7 +264,7 @@ export default function ContactPage() {
                   <Label htmlFor="affiliation">Affiliation (Optional)</Label>
                   <Input
                     id="affiliation"
-                    placeholder="University, Company, or Organization"
+                    placeholder="University, Company, or Organization..."
                     className="backdrop-blur-sm bg-background/50"
                     value={formData.affiliation}
                     onChange={handleInputChange}
@@ -275,7 +275,7 @@ export default function ContactPage() {
                   <Label htmlFor="subject">Subject</Label>
                   <Input
                     id="subject"
-                    placeholder="Agricultural Robotics Collaboration"
+                    placeholder="Type here..."
                     className="backdrop-blur-sm bg-background/50"
                     value={formData.subject}
                     onChange={handleInputChange}
@@ -287,7 +287,7 @@ export default function ContactPage() {
                   <Label htmlFor="message">Message</Label>
                   <Textarea
                     id="message"
-                    placeholder="Please describe your inquiry, research interests, or collaboration proposal in agricultural robotics and AI automation..."
+                    placeholder="Please describe your inquiry..."
                     className="min-h-[120px] backdrop-blur-sm bg-background/50"
                     value={formData.message}
                     onChange={handleInputChange}

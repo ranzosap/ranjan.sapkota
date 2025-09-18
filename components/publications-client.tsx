@@ -24,7 +24,6 @@ export function PublicationsClient({ articles, allTags, allYears }: Publications
   const [currentPage, setCurrentPage] = useState(1)
   const articlesPerPage = 5
 
-  // ✅ Filters come from URL
   const searchQuery = searchParams.get("search") || ""
   const selectedTags = searchParams.get("tags")?.split(",").filter(Boolean) || []
   const selectedYears = searchParams.get("years")?.split(",").map(Number).filter(Boolean) || []
@@ -42,19 +41,19 @@ export function PublicationsClient({ articles, allTags, allYears }: Publications
 
   const handleSearchChange = (query: string) => {
     updateURL(query, selectedTags, selectedYears)
-    setCurrentPage(1) // ✅ reset page when search changes
+    setCurrentPage(1) 
   }
 
   const handleTagToggle = (tag: string) => {
     const newTags = selectedTags.includes(tag) ? selectedTags.filter((t) => t !== tag) : [...selectedTags, tag]
     updateURL(searchQuery, newTags, selectedYears)
-    setCurrentPage(1) // ✅ reset page when tags change
+    setCurrentPage(1) 
   }
 
   const handleYearToggle = (year: number) => {
     const newYears = selectedYears.includes(year) ? selectedYears.filter((y) => y !== year) : [...selectedYears, year]
     updateURL(searchQuery, selectedTags, newYears)
-    setCurrentPage(1) // ✅ reset page when years change
+    setCurrentPage(1) 
   }
 
   const clearFilters = () => {
@@ -62,7 +61,6 @@ export function PublicationsClient({ articles, allTags, allYears }: Publications
     setCurrentPage(1)
   }
 
-  // ✅ Filter + sort articles
   const filteredArticles = useMemo(() => {
     const filtered = articles.filter((article) => {
       if (searchQuery) {

@@ -43,7 +43,7 @@ export default function AdminDashboard() {
     citations: 0,
     articleViews: {} as Record<string, number>,
   })
-  const articlesPerPage = 6
+  const articlesPerPage = 5
 
   useEffect(() => {
     const loadArticles = async () => {

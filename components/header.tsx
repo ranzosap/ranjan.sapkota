@@ -19,7 +19,7 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
-    <header className="sticky top-0 z-50 w-full backdrop-blur-lg shadow-lg rounded-bl-[25px] rounded-br-[25px]">
+    <header className="sticky top-0 z-50 w-full backdrop-blur-lg shadow-lg md:rounded-bl-[25px] md:rounded-br-[25px]">
       <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex h-16 items-center justify-between">
           <Link href="/" className="flex items-center space-x-2">
@@ -56,8 +56,8 @@ export function Header() {
           </div>
         </div>
 
-        {mobileMenuOpen && (
-          <div className="md:hidden border-t border-border/30 backdrop-blur-lg bg-background/95 absolute left-0 right-0 shadow-lg">
+        {/* {mobileMenuOpen && (
+          <div className="md:hidden border-t border-border/30 backdrop-blur-lg absolute left-0 right-0 shadow-lg bg-green-50/95">
             <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
               <nav className="py-4 space-y-1">
                 {navigation.map((item) => (
@@ -73,7 +73,29 @@ export function Header() {
               </nav>
             </div>
           </div>
-        )}
+        )} */}
+
+        <div
+          className={`md:hidden border-t border-border/30 backdrop-blur-lg absolute left-0 right-0 shadow-lg bg-green-50 overflow-hidden transition-[max-height,opacity] duration-1000 ease-in-out rounded-bl-[25px] rounded-br-[25px]
+            ${mobileMenuOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"}
+          `}
+        >
+          <div className="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
+            <nav className="py-4 space-y-1">
+              {navigation.map((item) => (
+                <Link
+                  key={item.name}
+                  href={item.href}
+                  className="block py-3 px-4 text-sm font-medium text-foreground hover:text-primary transition-all duration-300 hover:bg-primary/10 rounded-md"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {item.name}
+                </Link>
+              ))}
+            </nav>
+          </div>
+        </div>
+
       </div>
     </header>
   )
