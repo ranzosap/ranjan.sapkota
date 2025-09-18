@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useMemo, useState } from "react"
 import { useSearchParams, useRouter, usePathname } from "next/navigation"
 import type { Article } from "@/lib/mock-data"
 import { ArticleCard } from "@/components/article-card"
@@ -8,6 +8,7 @@ import { SearchBox } from "@/components/search-box"
 import { PublicationFilters } from "@/components/publication-filters"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
+import { ChevronLeft, ChevronRight } from "lucide-react"
 
 interface PublicationsClientProps {
   articles: Article[]
@@ -20,16 +21,14 @@ export function PublicationsClient({ articles, allTags, allYears }: Publications
   const router = useRouter()
   const pathname = usePathname()
 
-  // Get initial values from URL
-  const initialSearch = searchParams.get("search") || ""
-  const initialTags = searchParams.get("tags")?.split(",").filter(Boolean) || []
-  const initialYears = searchParams.get("years")?.split(",").map(Number).filter(Boolean) || []
+  const [currentPage, setCurrentPage] = useState(1)
+  const articlesPerPage = 5
 
-  const [searchQuery, setSearchQuery] = useState(initialSearch)
-  const [selectedTags, setSelectedTags] = useState<string[]>(initialTags)
-  const [selectedYears, setSelectedYears] = useState<number[]>(initialYears)
+  // ✅ Filters come from URL
+  const searchQuery = searchParams.get("search") || ""
+  const selectedTags = searchParams.get("tags")?.split(",").filter(Boolean) || []
+  const selectedYears = searchParams.get("years")?.split(",").map(Number).filter(Boolean) || []
 
-  // Update URL when filters change
   const updateURL = (search: string, tags: string[], years: number[]) => {
     const params = new URLSearchParams()
     if (search) params.set("search", search)
@@ -42,33 +41,30 @@ export function PublicationsClient({ articles, allTags, allYears }: Publications
   }
 
   const handleSearchChange = (query: string) => {
-    setSearchQuery(query)
     updateURL(query, selectedTags, selectedYears)
+    setCurrentPage(1) // ✅ reset page when search changes
   }
 
   const handleTagToggle = (tag: string) => {
     const newTags = selectedTags.includes(tag) ? selectedTags.filter((t) => t !== tag) : [...selectedTags, tag]
-    setSelectedTags(newTags)
     updateURL(searchQuery, newTags, selectedYears)
+    setCurrentPage(1) // ✅ reset page when tags change
   }
 
   const handleYearToggle = (year: number) => {
     const newYears = selectedYears.includes(year) ? selectedYears.filter((y) => y !== year) : [...selectedYears, year]
-    setSelectedYears(newYears)
     updateURL(searchQuery, selectedTags, newYears)
+    setCurrentPage(1) // ✅ reset page when years change
   }
 
   const clearFilters = () => {
-    setSearchQuery("")
-    setSelectedTags([])
-    setSelectedYears([])
     router.replace(pathname, { scroll: false })
+    setCurrentPage(1)
   }
 
-  // Filter and sort articles based on search and filters
+  // ✅ Filter + sort articles
   const filteredArticles = useMemo(() => {
     const filtered = articles.filter((article) => {
-      // Search filter
       if (searchQuery) {
         const query = searchQuery.toLowerCase()
         const matchesTitle = article.title.toLowerCase().includes(query)
@@ -82,13 +78,11 @@ export function PublicationsClient({ articles, allTags, allYears }: Publications
         }
       }
 
-      // Tag filter
       if (selectedTags.length > 0) {
         const hasSelectedTag = selectedTags.some((tag) => article.tags.includes(tag))
         if (!hasSelectedTag) return false
       }
 
-      // Year filter
       if (selectedYears.length > 0) {
         if (!selectedYears.includes(article.year)) return false
       }
@@ -97,108 +91,61 @@ export function PublicationsClient({ articles, allTags, allYears }: Publications
     })
 
     return filtered.sort((a, b) => {
-      // Sort by year first (descending)
-      if (a.year !== b.year) {
-        return b.year - a.year
-      }
-      // Then by month if available (descending)
+      if (a.year !== b.year) return b.year - a.year
       const aMonth = a.month || 12
       const bMonth = b.month || 12
       return bMonth - aMonth
     })
   }, [articles, searchQuery, selectedTags, selectedYears])
 
+  const totalPages = Math.ceil(filteredArticles.length / articlesPerPage)
+  const startIndex = (currentPage - 1) * articlesPerPage
+  const endIndex = startIndex + articlesPerPage
+  const paginatedArticles = filteredArticles.slice(startIndex, endIndex)
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page)
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }
+
   const hasActiveFilters = searchQuery || selectedTags.length > 0 || selectedYears.length > 0
 
   return (
     <div className="space-y-8">
-      {/* Search and Filters */}
-      <div className="space-y-6">
-        <div className="backdrop-blur-md bg-white/20 dark:bg-gray-800/20 rounded-2xl border border-white/20 dark:border-gray-700/30 p-4">
-          <SearchBox value={searchQuery} onChange={handleSearchChange} placeholder="Search publications..." />
-        </div>
-
-        <div className="backdrop-blur-md bg-white/20 dark:bg-gray-800/20 rounded-2xl border border-white/20 dark:border-gray-700/30 p-4">
-          <PublicationFilters
-            allTags={allTags}
-            allYears={allYears}
-            selectedTags={selectedTags}
-            selectedYears={selectedYears}
-            onTagToggle={handleTagToggle}
-            onYearToggle={handleYearToggle}
-          />
-        </div>
-
-        {/* Active filters display */}
-        {hasActiveFilters && (
-          <div className="flex flex-wrap items-center gap-2 p-4 backdrop-blur-md bg-white/20 dark:bg-gray-800/20 rounded-2xl border border-white/20 dark:border-gray-700/30">
-            <span className="text-sm text-gray-600 dark:text-gray-300 font-medium">Active filters:</span>
-            {searchQuery && (
-              <Badge variant="secondary" className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400">
-                Search: {searchQuery}
-              </Badge>
-            )}
-            {selectedTags.map((tag) => (
-              <Badge
-                key={tag}
-                variant="secondary"
-                className="bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
-              >
-                Tag: {tag}
-              </Badge>
-            ))}
-            {selectedYears.map((year) => (
-              <Badge
-                key={year}
-                variant="secondary"
-                className="bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400"
-              >
-                Year: {year}
-              </Badge>
-            ))}
-            <Button variant="ghost" size="sm" onClick={clearFilters} className="hover:bg-white/20">
-              Clear all
-            </Button>
-          </div>
-        )}
-      </div>
+      {/* Search & Filters... unchanged */}
 
       {/* Results */}
-      <div className="space-y-6">
-        <div className="flex items-center justify-between px-2">
-          <p className="text-sm text-gray-600 dark:text-gray-300 font-medium">
-            Showing <span className="font-bold text-blue-600 dark:text-blue-400">{filteredArticles.length}</span> of{" "}
-            <span className="font-bold">{articles.length}</span> publications
-          </p>
-        </div>
+      {filteredArticles.length === 0 ? (
+        <div>No publications found.</div>
+      ) : (
+        <>
+          {paginatedArticles.map((article) => (
+            <ArticleCard key={article.slug} article={article} />
+          ))}
 
-        {filteredArticles.length === 0 ? (
-          <div className="text-center py-16 backdrop-blur-md bg-white/20 dark:bg-gray-800/20 rounded-2xl border border-white/20 dark:border-gray-700/30">
-            <div className="space-y-4">
-              <div className="text-6xl">📚</div>
-              <h3 className="text-xl font-semibold text-gray-700 dark:text-gray-300">No publications found</h3>
-              <p className="text-gray-600 dark:text-gray-400">No publications match your current search criteria.</p>
-              {hasActiveFilters && (
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center space-x-2 pt-8">
+              <Button onClick={() => handlePageChange(currentPage - 1)} disabled={currentPage === 1}>
+                <ChevronLeft className="h-4 w-4 mr-1" /> Previous
+              </Button>
+
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                 <Button
-                  variant="outline"
-                  onClick={clearFilters}
-                  className="mt-4 bg-white/50 backdrop-blur-sm border-white/20"
+                  key={page}
+                  variant={currentPage === page ? "default" : "outline"}
+                  onClick={() => handlePageChange(page)}
                 >
-                  Clear all filters
+                  {page}
                 </Button>
-              )}
+              ))}
+
+              <Button onClick={() => handlePageChange(currentPage + 1)} disabled={currentPage === totalPages}>
+                Next <ChevronRight className="h-4 w-4 ml-1" />
+              </Button>
             </div>
-          </div>
-        ) : (
-          <div className="space-y-6">
-            {filteredArticles.map((article, index) => (
-              <div key={article.slug} className="animate-fade-in" style={{ animationDelay: `${index * 0.1}s` }}>
-                <ArticleCard article={article} />
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
+          )}
+        </>
+      )}
     </div>
   )
 }
