@@ -76,7 +76,7 @@ export function Header() {
         )} */}
 
         <div
-          className={`md:hidden border-t border-border/30 backdrop-blur-lg absolute left-0 right-0 shadow-lg bg-green-50 overflow-hidden transition-[max-height,opacity] duration-1000 ease-in-out rounded-bl-[25px] rounded-br-[25px]
+          className={`md:hidden border-t border-border/30 backdrop-blur-lg absolute left-0 right-0 shadow-lg dark:bg-gray-800/100 bg-green-50 overflow-hidden transition-[max-height,opacity] duration-1000 ease-in-out rounded-bl-[25px] rounded-br-[25px]
             ${mobileMenuOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"}
           `}
         >
