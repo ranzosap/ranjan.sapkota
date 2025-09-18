@@ -31,7 +31,7 @@ export function AdminFloatingButton() {
       // Navigate to admin dashboard
       router.push("/admin")
     } else {
-      setError("Invalid credentials. Use admin/admin123 for demo.")
+      setError("Invalid credentials.")
     }
   }
 
