@@ -3,6 +3,8 @@
 # dependencies
 /node_modules
 
+/FileContentIndex
+
 # next.js
 /.next/
 /out/
