@@ -280,9 +280,6 @@ export function ArticleEditor({ article }: ArticleEditorProps) {
                         }}
                       />
                     </div>
-                    <p className="text-sm text-gray-500 mt-1">
-                      Use Markdown syntax for formatting. The toolbar above helps insert common formatting.
-                    </p>
                   </div>
                 </CardContent>
               </Card>
