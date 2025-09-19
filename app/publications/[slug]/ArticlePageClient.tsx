@@ -256,6 +256,14 @@ export default function ArticlePageClient({ params }: ArticlePageProps) {
             ) : (
               <div className="whitespace-pre-wrap">{article.content || "No content available."}</div>
             )}
+
+            {/* optional code if MdxContent don't work in future */}
+            {/* {article.body?.code ? (
+                <div className="whitespace-pre-wrap">{article.body.code}</div>
+              ) : (
+                <div className="whitespace-pre-wrap">{article.content || "No content available."}</div>
+              )} */}
+
           </div>
 
           {/* Related articles */}

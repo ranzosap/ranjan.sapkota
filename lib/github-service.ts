@@ -249,26 +249,26 @@ class GitHubService {
 
   formatArticleContent(article: any): string {
     const frontmatter = `---
-title: "${article.title}"
-authors: [${article.authors.map((author: string) => `"${author}"`).join(", ")}]
-year: ${article.year}
-month: ${article.month || 1}
-publication_venue: "${article.publication_venue}"
-abstract: "${article.abstract || ""}"
-tags: [${article.tags.map((tag: string) => `"${tag}"`).join(", ")}]
-published: ${article.published}
-featured: ${article.featured || false}
-doi: "${article.doi || ""}"
-pdf_url: "${article.pdf_url || ""}"
-code_url: "${article.code_url || ""}"
-dataset_url: "${article.dataset_url || ""}"
-github_link: "${this.generateArticleLink(article.title)}"
----
+    title: "${article.title}"
+    authors: [${article.authors.map((author: string) => `"${author}"`).join(", ")}]
+    year: ${article.year}
+    month: ${article.month || 1}
+    publication_venue: "${article.publication_venue}"
+    abstract: "${article.abstract || ""}"
+    tags: [${article.tags.map((tag: string) => `"${tag}"`).join(", ")}]
+    published: ${article.published}
+    featured: ${article.featured || false}
+    doi: "${article.doi || ""}"
+    pdf_url: "${article.pdf_url || ""}"
+    code_url: "${article.code_url || ""}"
+    dataset_url: "${article.dataset_url || ""}"
+    github_link: "${this.generateArticleLink(article.title)}"
+    ---
 
-${article.body.code}
-`
-    return frontmatter
+    ${article.body.code}
+    `
+        return frontmatter
+      }
   }
-}
 
 export const githubService = new GitHubService()
