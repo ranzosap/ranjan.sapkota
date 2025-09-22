@@ -1,10 +1,10 @@
 ---
-    title: "Testing media upload"
+    title: "Testing this media from admin"
     authors: ["Ranjan Sapkota", "asdasd"]
     year: 2025
     month: 9
     publication_venue: ""
-    abstract: "Testing media upload"
+    abstract: "Testing this media from admin"
     tags: ["asdasd"]
     published: true
     featured: false
@@ -12,17 +12,8 @@
     pdf_url: ""
     code_url: "https://github.com/ranzosap/ranjan.sapkota"
     dataset_url: ""
-    github_link: "https://github.com/ranzosap/ranjan.sapkota/articles/testing-media-upload"
+    github_link: "https://github.com/ranzosap/ranjan.sapkota/articles/testing-this-media-from-admin"
     ---
 
-    ![Image (1).jpg](image://image_1758539743578_Image__1__jpg)
-
-
-Testing media upload
-Testing media upload
-Testing media upload
-Testing media upload
-Testing media upload
-Testing media upload
-
+    Testing this media from admin![european-shorthair-8601492_640.jpg](image://image_1758539986310_european_shorthair_8601492_640_jpg)
     
