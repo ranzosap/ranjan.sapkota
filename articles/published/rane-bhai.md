@@ -1,10 +1,10 @@
 ---
-    title: "rane bhai"
+    title: "The media upload testing"
     authors: ["Ranjan Sapkota", "asdasd"]
     year: 2025
     month: 9
     publication_venue: ""
-    abstract: "rane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhai"
+    abstract: "The media upload testing"
     tags: ["asdasd"]
     published: true
     featured: false
@@ -12,10 +12,8 @@
     pdf_url: ""
     code_url: "https://github.com/ranzosap/ranjan.sapkota"
     dataset_url: ""
-    github_link: "https://github.com/ranzosap/ranjan.sapkota/articles/rane-bhai"
+    github_link: "https://github.com/ranzosap/ranjan.sapkota/articles/the-media-upload-testing"
     ---
 
-    ![Image.jpg](data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4QCMRXhpZgAATU0AKgAAAAgABQESAAMAAAABAAEAAAEaAAUAAAABAAAASgEbAAUAAAABAAAAUgEoAAMAAAABAAIAAIdpAAQAAAABAAAAWgAAAAAAAABIAAAAAQAAAEgAAAABAAOgAQADAAAAAQABAACgAgAEAAAAAQAAAK6gAwAEAAAAAQAAAFEAAAAA/8AAEQgAUQCuAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/bAEMAAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAf/bAEMBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAf/dAAQAC//aAAwDAQACEQMRAD8A/sAooor+Nz/P8KKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAP/0P7AKKKK/jc/z/CiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD/9H+wCiiiv43P8/wooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//S/sAooor+Nz/P8KKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAP/0/7AKKKK/jc/z/CiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD/9T+wCiiiv43P8/wooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//Z)
-rane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhairane bhai
-
+    The media upload testing![Image.jpg](data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAASABIAAD/4QCMRXhpZgAATU0AKgAAAAgABQESAAMAAAABAAEAAAEaAAUAAAABAAAASgEbAAUAAAABAAAAUgEoAAMAAAABAAIAAIdpAAQAAAABAAAAWgAAAAAAAABIAAAAAQAAAEgAAAABAAOgAQADAAAAAQABAACgAgAEAAAAAQAAAK6gAwAEAAAAAQAAAFEAAAAA/8AAEQgAUQCuAwEiAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh4uPk5ebn6Onq8fLz9PX29/j5+v/EAB8BAAMBAQEBAQEBAQEAAAAAAAABAgMEBQYHCAkKC//EALURAAIBAgQEAwQHBQQEAAECdwABAgMRBAUhMQYSQVEHYXETIjKBCBRCkaGxwQkjM1LwFWJy0QoWJDThJfEXGBkaJicoKSo1Njc4OTpDREVGR0hJSlNUVVZXWFlaY2RlZmdoaWpzdHV2d3h5eoKDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uLj5OXm5+jp6vLz9PX29/j5+v/bAEMAAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAf/bAEMBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAf/dAAQAC//aAAwDAQACEQMRAD8A/sAooor+Nz/P8KKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAP/0P7AKKKK/jc/z/CiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD/9H+wCiiiv43P8/wooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//S/sAooor+Nz/P8KKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKAP/0/7AKKKK/jc/z/CiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD/9T+wCiiiv43P8/wooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//Z)
     
