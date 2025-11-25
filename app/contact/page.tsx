@@ -1,8 +1,6 @@
 "use client"
 
-import type React from "react"
-
-import { useState } from "react"
+import React, { useState } from "react"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -10,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Label } from "@/components/ui/label"
 import { Mail, MapPin, Phone, Calendar, ExternalLink, Send, Loader2 } from "lucide-react"
 import { useToast } from "@/hooks/use-toast"
+import emailjs from "@emailjs/browser"
 
 export default function ContactPage() {
   const [isSubmitting, setIsSubmitting] = useState(false)
@@ -33,18 +32,13 @@ export default function ContactPage() {
     setIsSubmitting(true)
 
     try {
-      // EmailJS integration - replace with your actual service details
-      const emailData = {
-        from_name: `${formData.firstName} ${formData.lastName}`,
-        from_email: formData.email,
-        affiliation: formData.affiliation,
-        subject: formData.subject,
-        message: formData.message,
-        to_name: "Ranjan Sapkota",
-      }
+      await emailjs.send(
+        process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!,
+        process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!,
+        formData,
+        process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!
+      )
 
-      // Simulate EmailJS send (replace with actual EmailJS implementation)
-      await new Promise((resolve) => setTimeout(resolve, 2000))
 
       toast({
         title: "Message sent successfully!",
@@ -61,6 +55,7 @@ export default function ContactPage() {
         message: "",
       })
     } catch (error) {
+      console.error("Email sending failed:", error)
       toast({
         title: "Failed to send message",
         description: "Please try again or contact me directly via email.",
@@ -104,7 +99,8 @@ export default function ContactPage() {
                   <Phone className="h-5 w-5 text-primary mt-0.5" />
                   <div className="space-y-1">
                     <p className="font-medium">Phone</p>
-                    <p className="text-muted-foreground">+123213123132321</p>
+                    <p className="text-muted-foreground">123213123132321</p>
+                    <p className="text-sm text-muted-foreground">Please email first</p>
                   </div>
                 </div>
 
@@ -138,81 +134,6 @@ export default function ContactPage() {
                 </div>
               </CardContent>
             </Card>
-
-            {/* Quick Links */}
-            <Card className="backdrop-blur-md bg-card/70 border-border/30 shadow-lg">
-              <CardHeader>
-                <CardTitle>Academic Profiles</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <Button
-                  variant="outline"
-                  className="w-full justify-start backdrop-blur-sm bg-background/50 hover:bg-background/70"
-                  asChild
-                >
-                  <a href="https://scholar.google.com" target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    Google Scholar Profile
-                  </a>
-                </Button>
-
-                <Button
-                  variant="outline"
-                  className="w-full justify-start backdrop-blur-sm bg-background/50 hover:bg-background/70"
-                  asChild
-                >
-                  <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    LinkedIn Profile
-                  </a>
-                </Button>
-
-                <Button
-                  variant="outline"
-                  className="w-full justify-start backdrop-blur-sm bg-background/50 hover:bg-background/70"
-                  asChild
-                >
-                  <a href="https://orcid.org" target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    ORCID Profile
-                  </a>
-                </Button>
-
-                <Button
-                  variant="outline"
-                  className="w-full justify-start backdrop-blur-sm bg-background/50 hover:bg-background/70"
-                  asChild
-                >
-                  <a href="https://researchgate.net" target="_blank" rel="noopener noreferrer">
-                    <ExternalLink className="h-4 w-4 mr-2" />
-                    ResearchGate Profile
-                  </a>
-                </Button>
-              </CardContent>
-            </Card>
-
-            {/* Response Time */}
-            <Card className="backdrop-blur-md bg-card/70 border-border/30 shadow-lg">
-              <CardHeader>
-                <CardTitle>Response Time</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-3">
-                <div className="space-y-2">
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Conference Invitations</span>
-                    <span className="text-sm text-muted-foreground">2-3 days</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">Student Inquiries</span>
-                    <span className="text-sm text-muted-foreground">1-2 days</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-sm">General Questions</span>
-                    <span className="text-sm text-muted-foreground">3-5 days</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
           </div>
 
           {/* Contact Form */}
@@ -227,22 +148,20 @@ export default function ContactPage() {
                     <Label htmlFor="firstName">First Name</Label>
                     <Input
                       id="firstName"
-                      placeholder=""
-                      className="backdrop-blur-sm bg-background/50"
                       value={formData.firstName}
                       onChange={handleInputChange}
                       required
+                      className="backdrop-blur-sm bg-background/50"
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="lastName">Last Name</Label>
                     <Input
                       id="lastName"
-                      placeholder=""
-                      className="backdrop-blur-sm bg-background/50"
                       value={formData.lastName}
                       onChange={handleInputChange}
                       required
+                      className="backdrop-blur-sm bg-background/50"
                     />
                   </div>
                 </div>
@@ -252,11 +171,10 @@ export default function ContactPage() {
                   <Input
                     id="email"
                     type="email"
-                    placeholder="Your email address..."
-                    className="backdrop-blur-sm bg-background/50"
                     value={formData.email}
                     onChange={handleInputChange}
                     required
+                    className="backdrop-blur-sm bg-background/50"
                   />
                 </div>
 
@@ -264,10 +182,9 @@ export default function ContactPage() {
                   <Label htmlFor="affiliation">Affiliation (Optional)</Label>
                   <Input
                     id="affiliation"
-                    placeholder="University, Company, or Organization..."
-                    className="backdrop-blur-sm bg-background/50"
                     value={formData.affiliation}
                     onChange={handleInputChange}
+                    className="backdrop-blur-sm bg-background/50"
                   />
                 </div>
 
@@ -275,11 +192,10 @@ export default function ContactPage() {
                   <Label htmlFor="subject">Subject</Label>
                   <Input
                     id="subject"
-                    placeholder="Type here..."
-                    className="backdrop-blur-sm bg-background/50"
                     value={formData.subject}
                     onChange={handleInputChange}
                     required
+                    className="backdrop-blur-sm bg-background/50"
                   />
                 </div>
 
@@ -287,11 +203,10 @@ export default function ContactPage() {
                   <Label htmlFor="message">Message</Label>
                   <Textarea
                     id="message"
-                    placeholder="Please describe your inquiry..."
-                    className="min-h-[120px] backdrop-blur-sm bg-background/50"
                     value={formData.message}
                     onChange={handleInputChange}
                     required
+                    className="min-h-[120px] backdrop-blur-sm bg-background/50"
                   />
                 </div>
 
@@ -312,11 +227,6 @@ export default function ContactPage() {
                     </>
                   )}
                 </Button>
-
-                <p className="text-sm text-muted-foreground text-center">
-                  I typically respond within 1-3 business days. For urgent research matters, please mention it in the
-                  subject line.
-                </p>
               </form>
             </CardContent>
           </Card>

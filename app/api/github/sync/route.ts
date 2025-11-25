@@ -11,42 +11,60 @@ export async function POST(request: NextRequest) {
   try {
     const { file }: { file: GitHubFile } = await request.json()
 
+    if (!file || !file.path || !file.content || !file.message) {
+      return NextResponse.json(
+        { success: false, error: "Missing file path, content, or message" },
+        { status: 400 },
+      )
+    }
+
     const token = process.env.GITHUB_TOKEN
     if (!token) {
       console.error("No GitHub token found in environment variables")
-      return NextResponse.json({ success: false, error: "GitHub token not configured" }, { status: 401 })
+      return NextResponse.json(
+        { success: false, error: "GitHub token not configured" },
+        { status: 401 },
+      )
     }
 
     const owner = "ranzosap"
     const repo = "ranjan.sapkota"
+    const branch = "main"
     const url = `https://api.github.com/repos/${owner}/${repo}/contents/${file.path}`
 
-    console.log("Server-side GitHub sync:", {
-      owner,
-      repo,
-      path: file.path,
-      url,
-    })
+    console.log("Server-side GitHub sync:", { owner, repo, path: file.path, url })
 
-    // First, try to get the existing file to get its SHA
+    // Step 1: Check if the file exists to get its SHA
     let existingSha: string | undefined
     try {
-      const existingResponse = await fetch(url, {
+      const existingResponse = await fetch(`${url}?ref=${branch}`, {
         headers: {
           Authorization: `token ${token}`,
-          "Content-Type": "application/json",
-          Accept: "application/vnd.github.v3+json",
+          "Accept": "application/vnd.github.v3+json",
         },
       })
+
       if (existingResponse.ok) {
         const existingData = await existingResponse.json()
         existingSha = existingData.sha
+      } else if (existingResponse.status !== 404) {
+        const errorData = await existingResponse.json()
+        console.error("GitHub API error fetching file:", existingResponse.status, errorData)
+        return NextResponse.json(
+          { success: false, error: `GitHub API fetch error: ${existingResponse.status}` },
+          { status: existingResponse.status },
+        )
       }
-    } catch (error) {
-      console.log("File doesn't exist yet, creating new file")
+      // If 404, file does not exist — we will create it
+    } catch (err) {
+      console.log("File does not exist, will create new file", err)
     }
 
-    const response = await fetch(url, {
+    // Step 2: Encode content in Base64
+    const contentBase64 = Buffer.from(file.content, "utf-8").toString("base64")
+
+    // Step 3: PUT request to create or update file
+    const putResponse = await fetch(url, {
       method: "PUT",
       headers: {
         Authorization: `token ${token}`,
@@ -55,23 +73,21 @@ export async function POST(request: NextRequest) {
       },
       body: JSON.stringify({
         message: file.message,
-        content: btoa(unescape(encodeURIComponent(file.content))), // Proper UTF-8 encoding
-        sha: existingSha || file.sha,
+        content: contentBase64,
+        sha: existingSha, // only include if updating
+        branch,
       }),
     })
 
-    if (!response.ok) {
-      const errorData = await response.json()
-      console.error("GitHub API error:", {
-        status: response.status,
-        statusText: response.statusText,
+    if (!putResponse.ok) {
+      const errorData = await putResponse.json()
+      console.error("GitHub API error during PUT:", {
+        status: putResponse.status,
         error: errorData,
-        url: url,
       })
-
       return NextResponse.json(
-        { success: false, error: `GitHub API error: ${response.status}` },
-        { status: response.status },
+        { success: false, error: `GitHub API error: ${putResponse.status}` },
+        { status: putResponse.status },
       )
     }
 
