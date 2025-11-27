@@ -91,7 +91,6 @@ export default function ContactPage() {
                   <div className="space-y-1">
                     <p className="font-medium">Email</p>
                     <p className="text-muted-foreground">rs2672@cornell.edu</p>
-                    <p className="text-sm text-muted-foreground">Primary contact method</p>
                   </div>
                 </div>
 
@@ -99,8 +98,7 @@ export default function ContactPage() {
                   <Phone className="h-5 w-5 text-primary mt-0.5" />
                   <div className="space-y-1">
                     <p className="font-medium">Phone</p>
-                    <p className="text-muted-foreground">123213123132321</p>
-                    <p className="text-sm text-muted-foreground">Please email first</p>
+                    <p className="text-muted-foreground">+1 (701) 793-3563</p>
                   </div>
                 </div>
 
@@ -109,13 +107,15 @@ export default function ContactPage() {
                   <div className="space-y-1">
                     <p className="font-medium">Address</p>
                     <p className="text-muted-foreground">
+                      Riley-Robb Hall
+                      <br/>
                       111 Wing Dr
                       <br />
                       Ithaca, NY 14853
                       <br />
-                      Cornell University
+                      Cornell University,
                       <br />
-                      Biological and Environmental Engineering
+                      AgRobotics Lab, Department of Biological and Environmental Engineering
                     </p>
                   </div>
                 </div>
