@@ -23,11 +23,7 @@ techniques including Otsu’s method, and classifying the flower color group wit
 
 
 
-
-
-![Image (1)](/uploads/cd71f133-99d2-4a8e-9db3-bdc2a7532891-Image--1-.jpg)
-
-
+![Image](/uploads/88d54291-d9e2-41e4-adb6-593009052a62-Image.jpg)
 
 
 
