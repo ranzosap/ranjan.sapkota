@@ -1,11 +1,11 @@
 ---
     title: "Machine Vision System for Early-stage Apple Flowers and Flower Clusters Detection for Precision Thinning and Pollination"
-    authors: ["Ranjan Sapkota", "Salik Ram Khanal", "Dawood Ahmed", "Uddhav Bhattarai", "Manoj Karkee"]
+    authors: ["Ranjan Sapkota"]
     year: 2025
     month: 11
     publication_venue: ""
     abstract: "Early-stage identification of fruit flowers that are in both opened and unopened condition in an orchard environment is significant information to perform crop load management operations such as flower thinning and pollination using automated and robotic platforms. These operations are important in tree-fruit agriculture to enhance fruit quality, manage crop load, and enhance the overall profit. The recent development in agricultural automation suggests that this can be done using robotics which includes machine vision technology. In this article, we proposed a vision system that detects early-stage flowers in an unstructured orchard environment using YOLOv5 object detection algorithm. For the robotics implementation, the position of a cluster of the flower blossom is important to navigate the robot and the end effector. The centroid of individual flowers (both open and unopen) was identified and associated with flower clusters via K-means clustering. The accuracy of the opened and unopened flower detection is achieved up to mAP of 81.9% in commercial orchard images."
-    tags: ["Agriculture automation", "Precision Thinning", "Flower Detection", "Flower Clustering", "YOLOv5", "Object Detection"]
+    tags: []
     published: true
     featured: false
     doi: ""
@@ -26,13 +26,6 @@ early study on feature extraction of lesquerella flower was presented by Thorp a
 techniques including Otsu’s method, and classifying the flower color group with contour shapes using k-mean
 
 ![Image (1)](/uploads/b1dcf9d0-8dde-4175-be27-25432d0e8049-Image--1-.jpg "width=100%")
-
-
-
-
-
-
-
 
 
 
