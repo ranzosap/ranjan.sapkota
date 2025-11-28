@@ -21,7 +21,7 @@ of various operations such as image enhancement, image restoration, and image an
 early study on feature extraction of lesquerella flower was presented by Thorp and Dierig (2011), where the authors developed an image processing algorithm to detect flowers using image segmentation by transforming the image to the hue, saturation, and intensity (HSI) color space. Hoˇcevar et al. (2014) estimated the number of flower clusters of individual trees in a high-density apple orchard by implementing apple flower detection based on thresholding and morphological image processing in hue, saturation, luminance (HSL) color space image. Likewise, there are several studies that performed flower detection using the traditional image processing methods such as morphological image processing and various segmentation
 techniques including Otsu’s method, and classifying the flower color group with contour shapes using k-mean
 
-
+https://www.youtube.com/watch?v=H-ExNmHo2xI&list=RDH-ExNmHo2xI&start_radio=1
 
 
 
