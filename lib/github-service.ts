@@ -1,4 +1,5 @@
 // GitHub API service for storing articles in repository
+import type { Article } from "./mock-data"
 export interface GitHubConfig {
   owner: string
   repo: string
@@ -12,27 +13,6 @@ export interface GitHubFile {
   sha?: string
 }
 
-export interface Article {
-  slug: string
-  title: string
-  authors: string[]
-  year: number
-  month?: number
-  publication_venue: string
-  abstract: string
-  tags: string[]
-  published: boolean
-  featured: boolean
-  doi: string
-  pdf_url: string
-  code_url: string
-  dataset_url: string
-  thumbnail: string
-  readingTime: number
-  url: string
-  body: { code: string }
-  github_link: string
-}
 
 class GitHubService {
   private config: GitHubConfig = {
@@ -289,7 +269,7 @@ class GitHubService {
   }
 
   formatArticleContent(article: any): string {
-    const frontmatter = `---
+    const frontmatter = `
     title: "${article.title}"
     authors: [${article.authors.map((author: string) => `"${author}"`).join(", ")}]
     year: ${article.year}
@@ -304,7 +284,7 @@ class GitHubService {
     code_url: "${article.code_url || ""}"
     dataset_url: "${article.dataset_url || ""}"
     github_link: "${this.generateArticleLink(article.title)}"
-    ---
+    
 
     ${article.body.code}
     `
