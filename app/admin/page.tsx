@@ -240,14 +240,14 @@ export default function AdminDashboard() {
                   New Article
                 </Button>
                 {/* Updated Upload Media button to navigate to media management page */}
-                <Button
+                {/* <Button
                   variant="outline"
                   onClick={() => router.push("/admin/media")}
                   className="bg-white/50 backdrop-blur-sm border-white/20"
                 >
                   <Upload className="h-4 w-4 mr-2" />
                   Upload Media
-                </Button>
+                </Button> */}
               </div>
             </div>
           </div>
