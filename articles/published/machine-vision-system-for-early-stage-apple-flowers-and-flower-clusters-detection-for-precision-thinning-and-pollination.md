@@ -16,6 +16,10 @@
     ---
 
     
+
+![Video](/uploads/21fcc555-36a9-4cd1-a88f-e813243b7e1e-peter.mp4 "width=100%")
+
+
 Various machine vision technologies have been applied using various types of object detection algorithms in agriculture automation for more than a decade. Nilsback and
 Zisserman (2006) proposed a visual vocabulary that can support object classification for flowers that have a significant visual similarity using traditional image processing methods. Traditional image processing techniques consist
 of various operations such as image enhancement, image restoration, and image analysis that can be performed to manipulate images using digital computers. Another
