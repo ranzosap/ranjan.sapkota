@@ -15,27 +15,11 @@
     github_link: "https://github.com/ranzosap/ranjan.sapkota/blob/main/articles/published/machine-vision-system-for-early-stage-apple-flowers-and-flower-clusters-detection-for-precision-thinning-and-pollination.md"
     ---
 
-    Various machine vision technologies have been applied
-using various types of object detection algorithms in agriculture automation for more than a decade. Nilsback and
-Zisserman (2006) proposed a visual vocabulary that can
-support object classification for flowers that have a significant visual similarity using traditional image processing
-methods. Traditional image processing techniques consist
-of various operations such as image enhancement, image
-restoration, and image analysis that can be performed
-to manipulate images using digital computers. Another
-early study on feature extraction of lesquerella flower was
-presented by Thorp and Dierig (2011), where the authors
-developed an image processing algorithm to detect flowers using image segmentation by transforming the image
-to the hue, saturation, and intensity (HSI) color space.
-Hoˇcevar et al. (2014) estimated the number of flower
-clusters of individual trees in a high-density apple orchard by implementing apple flower detection based on
-thresholding and morphological image processing in hue,
-saturation, luminance (HSL) color space image. Likewise,
-there are several studies that performed flower detection
-using the traditional image processing methods such as
-morphological image processing and various segmentation
-techniques including Otsu’s method, and classifying the
-flower color group with contour shapes using k-mean
+    Various machine vision technologies have been applied using various types of object detection algorithms in agriculture automation for more than a decade. Nilsback and
+Zisserman (2006) proposed a visual vocabulary that can support object classification for flowers that have a significant visual similarity using traditional image processing methods. Traditional image processing techniques consist
+of various operations such as image enhancement, image restoration, and image analysis that can be performed to manipulate images using digital computers. Another
+early study on feature extraction of lesquerella flower was presented by Thorp and Dierig (2011), where the authors developed an image processing algorithm to detect flowers using image segmentation by transforming the image to the hue, saturation, and intensity (HSI) color space. Hoˇcevar et al. (2014) estimated the number of flower clusters of individual trees in a high-density apple orchard by implementing apple flower detection based on thresholding and morphological image processing in hue, saturation, luminance (HSL) color space image. Likewise, there are several studies that performed flower detection using the traditional image processing methods such as morphological image processing and various segmentation
+techniques including Otsu’s method, and classifying the flower color group with contour shapes using k-mean
 
 ![Image (1)](blob:http://localhost:3000/d2d32816-f5ff-4e6f-a6c5-efe72e38a5ca)
 
