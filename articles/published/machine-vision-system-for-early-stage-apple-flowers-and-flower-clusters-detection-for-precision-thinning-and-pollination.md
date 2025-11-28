@@ -1,23 +1,6 @@
 ---
-    title: "machine-vision-system-for-early-stage-apple-flowers-and-flower-clusters-detection-for-precision-thinning-and-pollination"
-    authors: ["Ranjan Sapkota"]
-    year: 2025
-    month: 11
-    publication_venue: ""
-    abstract: "kjhkjhkjh"
-    tags: []
-    published: true
-    featured: false
-    doi: ""
-    pdf_url: ""
-    code_url: ""
-    dataset_url: ""
-    github_link: "https://github.com/ranzosap/ranjan.sapkota/blob/main/articles/published/machine-vision-system-for-early-stage-apple-flowers-and-flower-clusters-detection-for-precision-thinning-and-pollination.md"
-    ---
-
-    ---
     title: "Machine Vision System for Early-stage Apple Flowers and Flower Clusters Detection for Precision Thinning and Pollination"
-    authors: ["Ranjan Sapkota"]
+    authors: ["Ranjan Sapkota", "Salik Ram Khanal", "Dawood Ahmed", "Uddhav Bhattarai", "Manoj karkee"]
     year: 2025
     month: 11
     publication_venue: ""
@@ -25,9 +8,9 @@
     tags: []
     published: true
     featured: false
-    doi: ""
-    pdf_url: ""
-    code_url: ""
+    doi: "https://www.google.com/?zx=1764337223299&no_sw_cr=1"
+    pdf_url: "https://www.google.com/?zx=1764337223299&no_sw_cr=1"
+    code_url: "https://www.google.com/?zx=1764337223299&no_sw_cr=1"
     dataset_url: ""
     github_link: "https://github.com/ranzosap/ranjan.sapkota/blob/main/articles/published/machine-vision-system-for-early-stage-apple-flowers-and-flower-clusters-detection-for-precision-thinning-and-pollination.md"
     ---
@@ -43,8 +26,5 @@ early study on feature extraction of lesquerella flower was presented by Thorp a
 techniques including Otsu’s method, and classifying the flower color group with contour shapes using k-mean
 
 ![Image (1)](/uploads/b1dcf9d0-8dde-4175-be27-25432d0e8049-Image--1-.jpg "width=100%")
-hhhhh
 
-
-    
     
