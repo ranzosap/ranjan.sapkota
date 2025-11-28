@@ -33,48 +33,67 @@ export function FileUpload({
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([])
 
   const onDrop = useCallback(
-    (acceptedFiles: File[]) => {
-      const newFiles: UploadedFile[] = acceptedFiles.map((file) => ({
-        id: Math.random().toString(36).substr(2, 9),
-        name: file.name,
-        size: file.size,
-        type: file.type,
-        url: URL.createObjectURL(file),
-        uploadProgress: 0,
-        status: "uploading" as const,
-      }))
+    async (acceptedFiles: File[]) => {
+      for (const f of acceptedFiles) {
+        const tempId = Math.random().toString(36).substr(2, 9)
+        setUploadedFiles((prev) => [
+          ...prev,
+          {
+            id: tempId,
+            name: f.name,
+            size: f.size,
+            type: f.type,
+            url: "",
+            uploadProgress: 0,
+            status: "uploading",
+          },
+        ])
 
-      setUploadedFiles((prev) => [...prev, ...newFiles])
+        const formData = new FormData()
+        formData.append("file", f)
 
-      // Simulate upload progress
-      newFiles.forEach((file) => {
-        simulateUpload(file.id)
-      })
+        try {
+          const res = await fetch("/api/upload", { method: "POST", body: formData })
+          const json = await res.json()
+          const finalUrl = res.ok && json.url ? json.url : ""
 
-      if (onFilesUploaded) {
-        onFilesUploaded(newFiles)
+          setUploadedFiles((prev) =>
+            prev.map((file) =>
+              file.id === tempId
+                ? {
+                    ...file,
+                    url: finalUrl || file.url,
+                    uploadProgress: 100,
+                    status: finalUrl ? "completed" : "error",
+                  }
+                : file,
+            ),
+          )
+
+          if (onFilesUploaded && finalUrl) {
+            onFilesUploaded([
+              {
+                id: tempId,
+                name: f.name,
+                size: f.size,
+                type: f.type,
+                url: finalUrl,
+                uploadProgress: 100,
+                status: "completed",
+              },
+            ])
+          }
+        } catch (e) {
+          setUploadedFiles((prev) =>
+            prev.map((file) => (file.id === tempId ? { ...file, status: "error" } : file)),
+          )
+        }
       }
     },
     [onFilesUploaded],
   )
 
-  const simulateUpload = (fileId: string) => {
-    let progress = 0
-    const interval = setInterval(() => {
-      progress += Math.random() * 30
-      if (progress >= 100) {
-        progress = 100
-        clearInterval(interval)
-        setUploadedFiles((prev) =>
-          prev.map((file) => (file.id === fileId ? { ...file, uploadProgress: 100, status: "completed" } : file)),
-        )
-      } else {
-        setUploadedFiles((prev) =>
-          prev.map((file) => (file.id === fileId ? { ...file, uploadProgress: progress } : file)),
-        )
-      }
-    }, 200)
-  }
+  const simulateUpload = (_fileId: string) => {}
 
   const removeFile = (fileId: string) => {
     setUploadedFiles((prev) => prev.filter((file) => file.id !== fileId))

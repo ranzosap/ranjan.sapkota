@@ -211,6 +211,30 @@ export const mockProjects: Project[] = [
 // Helper functions to replace contentlayer functions
 import { githubService } from "./github-service"
 
+function getDeletedSlugs(): string[] {
+  if (typeof window === "undefined") return []
+  try {
+    const stored = localStorage.getItem("deletedArticleSlugs")
+    return stored ? JSON.parse(stored) : []
+  } catch {
+    return []
+  }
+}
+
+function addDeletedSlug(slug: string) {
+  if (typeof window === "undefined") return
+  const current = getDeletedSlugs()
+  const next = Array.from(new Set([...current, slug]))
+  localStorage.setItem("deletedArticleSlugs", JSON.stringify(next))
+}
+
+function removeDeletedSlug(slug: string) {
+  if (typeof window === "undefined") return
+  const current = getDeletedSlugs()
+  const next = current.filter((s) => s !== slug)
+  localStorage.setItem("deletedArticleSlugs", JSON.stringify(next))
+}
+
 export function saveArticle(article: Omit<Article, "slug" | "url" | "readingTime">): Article {
   const slug = article.title
     .toLowerCase()
@@ -249,6 +273,7 @@ export function saveArticle(article: Omit<Article, "slug" | "url" | "readingTime
   // Save to localStorage (keeping for backward compatibility)
   if (typeof window !== "undefined") {
     localStorage.setItem("userArticles", JSON.stringify(updatedArticles))
+    removeDeletedSlug(slug)
 
     // Also save to GitHub (simulated)
     const status = article.published ? "published" : "draft"
@@ -281,6 +306,7 @@ export function updateArticle(slug: string, updates: Partial<Article>): Article 
 
   if (typeof window !== "undefined") {
     localStorage.setItem("userArticles", JSON.stringify(existingArticles))
+    removeDeletedSlug(slug)
 
     // Handle GitHub storage when status changes
     const statusChanged = originalArticle.published !== updatedArticle.published
@@ -336,6 +362,7 @@ export function deleteArticle(slug: string): boolean {
 
   if (typeof window !== "undefined") {
     localStorage.setItem("userArticles", JSON.stringify(filteredArticles))
+    addDeletedSlug(slug)
 
     // Also delete from GitHub if article exists
     if (articleToDelete) {
@@ -370,15 +397,17 @@ export async function syncArticlesFromGitHub(): Promise<void> {
       // Merge with existing localStorage articles, avoiding duplicates
       const existingArticles = getStoredArticles()
       const mergedArticles = [...existingArticles]
+      const deletedSlugs = getDeletedSlugs()
 
       githubArticles.forEach((githubArticle) => {
         const existingIndex = mergedArticles.findIndex((article) => article.slug === githubArticle.slug)
         if (existingIndex >= 0) {
-          // Update existing article
-          mergedArticles[existingIndex] = githubArticle
+          // Keep local edits; do not overwrite with GitHub
         } else {
-          // Add new article
-          mergedArticles.push(githubArticle)
+          // Add new article unless locally deleted
+          if (!deletedSlugs.includes(githubArticle.slug)) {
+            mergedArticles.push(githubArticle)
+          }
         }
       })
 

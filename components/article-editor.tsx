@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useToast } from "@/hooks/use-toast"
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -11,10 +11,12 @@ import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { ArrowLeft, Save, Eye, Plus, X, Bold, Italic, Link, List, Code } from "lucide-react"
+import { ArrowLeft, Save, Eye, Plus, X, Bold, Italic, Link, List, Code, Image as ImageIcon, Video } from "lucide-react"
 import type { Article } from "@/lib/mock-data"
 import { saveArticle, updateArticle } from "@/lib/mock-data"
 import { githubService } from "@/lib/github-service"
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { FileUpload } from "@/components/file-upload"
 
 interface ArticleEditorProps {
   article?: Article
@@ -45,6 +47,9 @@ export function ArticleEditor({ article }: ArticleEditorProps) {
   const [newTag, setNewTag] = useState("")
   const [newAuthor, setNewAuthor] = useState("")
   const [isLoading, setIsLoading] = useState(false)
+  const [isImageDialogOpen, setIsImageDialogOpen] = useState(false)
+  const [isMediaDialogOpen, setIsMediaDialogOpen] = useState(false)
+  const [isVisualMode, setIsVisualMode] = useState(false)
 
   const insertFormatting = (before: string, after = "") => {
     const textarea = document.getElementById("content-textarea") as HTMLTextAreaElement
@@ -61,6 +66,23 @@ export function ArticleEditor({ article }: ArticleEditorProps) {
     setTimeout(() => {
       textarea.focus()
       textarea.setSelectionRange(start + before.length, start + before.length + selectedText.length)
+    }, 0)
+  }
+
+  const insertTextAtCursor = (text: string) => {
+    const textarea = document.getElementById("content-textarea") as HTMLTextAreaElement
+    if (!textarea) {
+      setFormData((prev) => ({ ...prev, body: { code: prev.body.code + text } }))
+      return
+    }
+    const start = textarea.selectionStart
+    const end = textarea.selectionEnd
+    const value = textarea.value
+    const newValue = value.substring(0, start) + text + value.substring(end)
+    setFormData((prev) => ({ ...prev, body: { code: newValue } }))
+    setTimeout(() => {
+      textarea.focus()
+      textarea.setSelectionRange(start + text.length, start + text.length)
     }, 0)
   }
 
@@ -100,6 +122,136 @@ export function ArticleEditor({ article }: ArticleEditorProps) {
     }
   }
 
+  const handleImageInserted = (files: any[]) => {
+    if (!files || files.length === 0) return
+    const file = files[0]
+    const alt = file.name.replace(/\.[^.]+$/, "")
+    const markdown = `\n\n![${alt}](${file.url})\n\n`
+    insertTextAtCursor(markdown)
+    setIsImageDialogOpen(false)
+  }
+
+  const handleContentDrop = async (e: React.DragEvent<HTMLTextAreaElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    let dropped: File | undefined
+    const items = Array.from(e.dataTransfer.items || [])
+    for (const it of items) {
+      if (it.kind === "file") {
+        const f = it.getAsFile()
+        if (f && (f.type.startsWith("image/") || f.type.startsWith("video/") || f.type.startsWith("audio/"))) {
+          dropped = f
+          break
+        }
+      }
+    }
+    if (!dropped) {
+      const files = Array.from(e.dataTransfer.files || [])
+      dropped = files.find((f) => f.type.startsWith("image/") || f.type.startsWith("video/") || f.type.startsWith("audio/"))
+    }
+    if (!dropped) return
+    const formData = new FormData()
+    formData.append("file", dropped)
+    try {
+      const res = await fetch("/api/upload", { method: "POST", body: formData })
+      const json = await res.json()
+      if (res.ok && json.url) {
+        const alt = dropped.name.replace(/\.[^.]+$/, "")
+        const isImage = dropped.type.startsWith("image/")
+        const isVideo = dropped.type.startsWith("video/")
+        const isAudio = dropped.type.startsWith("audio/")
+        const label = isVideo ? "Video" : isAudio ? "Audio" : alt
+        const extra = isVideo ? ' "width=100%"' : ""
+        const markdown = `\n\n![${label}](${json.url}${extra})\n\n`
+        insertTextAtCursor(markdown)
+      }
+    } catch {}
+  }
+
+  const handleMediaInserted = (files: any[]) => {
+    if (!files || files.length === 0) return
+    const f = files[0]
+    const isVideo = (f.type || "").startsWith("video/")
+    const isAudio = (f.type || "").startsWith("audio/")
+    const base = f.name?.replace(/\.[^.]+$/, "") || "Media"
+    const label = isVideo ? "Video" : isAudio ? "Audio" : base
+    const extra = isVideo ? ' "width=100%"' : ""
+    const markdown = `\n\n![${label}](${f.url}${extra})\n\n`
+    insertTextAtCursor(markdown)
+    setIsMediaDialogOpen(false)
+  }
+
+  const imageRegex = /!\[(.*?)\]\((\S+?)(?:\s+"(.*?)")?\)/
+
+  function ResizableImage({ alt, src, widthSpec, onResize }: { alt: string; src: string; widthSpec?: string; onResize: (w: string) => void }) {
+    const boxRef = useRef<HTMLDivElement | null>(null)
+    const [dragging, setDragging] = useState(false)
+    const [width, setWidth] = useState<string>(widthSpec || "100%")
+
+    useEffect(() => {
+      setWidth(widthSpec || "100%")
+    }, [widthSpec])
+
+    const onMouseDown = () => setDragging(true)
+    const onMouseUp = () => {
+      if (!dragging || !boxRef.current) return
+      setDragging(false)
+      const w = boxRef.current.style.width || width
+      onResize(w)
+    }
+    const onMouseMove = (e: React.MouseEvent) => {
+      if (!dragging || !boxRef.current) return
+      const rect = boxRef.current.getBoundingClientRect()
+      const newW = Math.max(50, e.clientX - rect.left)
+      boxRef.current.style.width = `${newW}px`
+    }
+
+    return (
+      <div
+        ref={boxRef}
+        onMouseMove={onMouseMove}
+        onMouseUp={onMouseUp}
+        style={{ width, display: "inline-block", position: "relative" }}
+      >
+        <img src={src} alt={alt} style={{ maxWidth: "100%", height: "auto", display: "block" }} />
+        <span
+          onMouseDown={onMouseDown}
+          style={{ position: "absolute", right: 0, bottom: 0, width: 12, height: 12, background: "#3b82f6", cursor: "nwse-resize", borderRadius: 2 }}
+        />
+      </div>
+    )
+  }
+
+  const onVisualDrop = async (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault()
+    e.stopPropagation()
+    const items = Array.from(e.dataTransfer.items || [])
+    let image: File | undefined
+    for (const it of items) {
+      if (it.kind === "file") {
+        const f = it.getAsFile()
+        if (f && f.type.startsWith("image/")) {
+          image = f
+          break
+        }
+      }
+    }
+    if (!image) {
+      const files = Array.from(e.dataTransfer.files || [])
+      image = files.find((f) => f.type.startsWith("image/"))
+    }
+    if (!image) return
+    const fd = new FormData()
+    fd.append("file", image)
+    const res = await fetch("/api/upload", { method: "POST", body: fd })
+    const json = await res.json()
+    if (res.ok && json.url) {
+      const alt = image.name.replace(/\.[^.]+$/, "")
+      const md = `\n\n![${alt}](${json.url} "width=100%")\n\n`
+      insertTextAtCursor(md)
+    }
+  }
+
   const handleAddTag = () => {
     if (newTag.trim() && !formData.tags.includes(newTag.trim())) {
       setFormData((prev) => ({
@@ -135,13 +287,6 @@ export function ArticleEditor({ article }: ArticleEditorProps) {
       }))
     }
   }
-
-  // const handlePreview = () => {
-  //   toast({
-  //     title: "Preview",
-  //     description: "Preview functionality would open here",
-  //   })
-  // }
 
   return (
     <div className="min-h-screen">
@@ -215,7 +360,7 @@ export function ArticleEditor({ article }: ArticleEditorProps) {
 
                   <div>
                     <Label htmlFor="content">Content *</Label>
-                    <div className="bg-white/50 border border-white/20 rounded-md overflow-hidden">
+                    <div className="bg-white/50 border border-white/20 rounded-md overflow-visible">
                       <div className="flex items-center gap-2 p-2 border-b border-white/20 bg-white/30">
                         <Button
                           type="button"
@@ -257,28 +402,99 @@ export function ArticleEditor({ article }: ArticleEditorProps) {
                         >
                           <List className="h-4 w-4" />
                         </Button>
-                        <Button
-                          type="button"
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => insertFormatting("`", "`")}
-                          className="h-8 w-8 p-0"
-                          title="Code"
-                        >
-                          <Code className="h-4 w-4" />
-                        </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => insertFormatting("`", "`")}
+                      className="h-8 w-8 p-0"
+                      title="Code"
+                    >
+                      <Code className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setIsImageDialogOpen(true)}
+                      className="h-8 w-8 p-0"
+                      title="Image"
+                    >
+                      <ImageIcon className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setIsMediaDialogOpen(true)}
+                      className="h-8 w-8 p-0"
+                      title="Media"
+                    >
+                      <Video className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setIsVisualMode((v) => !v)}
+                      className="h-8 w-8 p-0"
+                      title={isVisualMode ? "Markdown" : "Visual"}
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
                       </div>
-                      <Textarea
-                        id="content-textarea"
-                        value={formData.body.code}
-                        onChange={(e) => setFormData((prev) => ({ ...prev, body: { code: e.target.value } }))}
-                        placeholder="Write your full article content here... Use the toolbar above for basic formatting."
-                        className="min-h-[400px] bg-transparent border-0 resize-none focus:ring-0 focus:outline-none"
-                        style={{
-                          fontFamily:
-                            'ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace',
-                        }}
-                      />
+                      {!isVisualMode ? (
+                        <Textarea
+                          id="content-textarea"
+                          value={formData.body.code}
+                          onChange={(e) => setFormData((prev) => ({ ...prev, body: { code: e.target.value } }))}
+                          onDragOver={(e) => e.preventDefault()}
+                          onDrop={handleContentDrop}
+                          placeholder="Write your full article content here... Use the toolbar above for basic formatting."
+                          className="min-h-[400px] bg-transparent border-0 resize-none focus:ring-0 focus:outline-none overflow-y-auto"
+                          style={{
+                            fontFamily:
+                              'ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace',
+                          }}
+                        />
+                      ) : (
+                        <div
+                          onDragOver={(e) => e.preventDefault()}
+                          onDrop={onVisualDrop}
+                          className="min-h-[400px] bg-transparent border-0 overflow-y-auto p-2"
+                          style={{
+                            fontFamily:
+                              'ui-monospace, SFMono-Regular, "SF Mono", Consolas, "Liberation Mono", Menlo, monospace',
+                          }}
+                        >
+                          {formData.body.code.split(/\n/).map((line, idx) => {
+                            const m = line.match(imageRegex)
+                            if (m) {
+                              const alt = m[1]
+                              const src = m[2]
+                              const title = m[3] || ""
+                              const w = (title.match(/width\s*=\s*([^\s"]+)/)?.[1]) || undefined
+                              return (
+                                <ResizableImage
+                                  key={`i-${idx}`}
+                                  alt={alt}
+                                  src={src}
+                                  widthSpec={w}
+                                  onResize={(nw) => {
+                                    const newLine = `![${alt}](${src} "width=${nw}")`
+                                    const lines = formData.body.code.split(/\n/)
+                                    lines[idx] = newLine
+                                    setFormData((prev) => ({ ...prev, body: { code: lines.join("\n") } }))
+                                  }}
+                                />
+                              )
+                            }
+                            return (
+                              <p key={`t-${idx}`} className="whitespace-pre-wrap">{line}</p>
+                            )
+                          })}
+                        </div>
+                      )}
                     </div>
                   </div>
                 </CardContent>
@@ -475,6 +691,30 @@ export function ArticleEditor({ article }: ArticleEditorProps) {
             </div>
           </div>
         </form>
+        <Dialog open={isImageDialogOpen} onOpenChange={setIsImageDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Upload Image</DialogTitle>
+            </DialogHeader>
+            <FileUpload
+              acceptedTypes={["image/*"]}
+              multiple={false}
+              onFilesUploaded={handleImageInserted}
+            />
+          </DialogContent>
+        </Dialog>
+        <Dialog open={isMediaDialogOpen} onOpenChange={setIsMediaDialogOpen}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Upload Media</DialogTitle>
+            </DialogHeader>
+            <FileUpload
+              acceptedTypes={["image/*", "video/*", "audio/*"]}
+              multiple={false}
+              onFilesUploaded={handleMediaInserted}
+            />
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   )

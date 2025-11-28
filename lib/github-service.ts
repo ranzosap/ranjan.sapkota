@@ -83,42 +83,23 @@ class GitHubService {
 
   async deleteFile(path: string, message: string, sha?: string): Promise<boolean> {
     try {
-      const url = `https://api.github.com/repos/${this.config.owner}/${this.config.repo}/contents/${path}`
-
-      // Get the file SHA if not provided
-      if (!sha) {
-        const getResponse = await fetch(url, {
-          headers: this.getAuthHeaders(),
-        })
-        if (getResponse.ok) {
-          const fileData = await getResponse.json()
-          sha = fileData.sha
-        } else {
-          console.log("File not found in GitHub, skipping delete")
-          return true
-        }
-      }
-
-      const response = await fetch(url, {
-        method: "DELETE",
-        headers: this.getAuthHeaders(),
-        body: JSON.stringify({
-          message,
-          sha,
-        }),
+      const response = await fetch("/api/github/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ path, message }),
       })
 
-      if (!response.ok) {
-        const errorData = await response.json()
-        console.error("GitHub delete API error:", errorData)
+      const result = await response.json()
+      if (!response.ok || !result.success) {
+        console.error("GitHub delete via server failed:", result)
         return false
       }
 
-      console.log("Successfully deleted from GitHub:", path)
+      console.log("Successfully deleted from GitHub via server:", path)
       return true
     } catch (error) {
       console.error("GitHub delete API error:", error)
-      return true // Return true to continue with localStorage functionality
+      return true
     }
   }
 
@@ -143,11 +124,41 @@ class GitHubService {
             const contentResponse = await fetch(file.download_url)
             if (contentResponse.ok) {
               const content = await contentResponse.text()
-              const article = this.parseMarkdownArticle(content, true) // All articles in published folder are published
-              if (article) {
-                articles.push(article)
-                console.log("Successfully parsed article:", article.title)
+              let article = this.parseMarkdownArticle(content, true)
+
+              if (!article) {
+                const title = (content.match(/^\s*#\s+(.*)$/m)?.[1]?.trim()) || file.name.replace(/\.md$/, "")
+                const slug = title
+                  .toLowerCase()
+                  .replace(/[^a-z0-9]+/g, "-")
+                  .replace(/(^-|-$)/g, "")
+
+                article = {
+                  slug,
+                  title,
+                  authors: ["Ranjan Sapkota"],
+                  year: new Date().getFullYear(),
+                  publication_venue: "",
+                  abstract: "",
+                  tags: [],
+                  published: true,
+                  featured: false,
+                  doi: "",
+                  pdf_url: "",
+                  code_url: "",
+                  dataset_url: "",
+                  thumbnail: "",
+                  readingTime: Math.ceil(content.split(/\s+/).length / 200),
+                  url: `/publications/${slug}`,
+                  body: { code: content },
+                  github_link: `https://github.com/${this.config.owner}/${this.config.repo}/blob/main/${this.getArticlePath(slug, "published")}`,
+                }
+
+                console.log("Parsed without frontmatter:", title)
               }
+
+              articles.push(article)
+              console.log("Successfully parsed article:", article.title)
             }
           }
         }
@@ -165,47 +176,76 @@ class GitHubService {
 
   private parseMarkdownArticle(content: string, published: boolean): Article | null {
     try {
-      const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---\n([\s\S]*)$/)
-      if (!frontmatterMatch) return null
+      const fm = content.match(/^\s*\uFEFF?---\r?\n([\s\S]*?)\r?\n---\r?\n?([\s\S]*)$/)
+      if (!fm) return null
 
-      const frontmatter = frontmatterMatch[1]
-      const body = frontmatterMatch[2]
+      const frontmatter = fm[1]
+      const body = fm[2] || ""
 
-      // Parse frontmatter
       const metadata: any = {}
-      frontmatter.split("\n").forEach((line) => {
+      const lines = frontmatter.split(/\r?\n/)
+      for (let i = 0; i < lines.length; i++) {
+        const line = lines[i]
         const match = line.match(/^(\w+):\s*(.*)$/)
-        if (match) {
-          const key = match[1]
-          let value = match[2].trim()
+        if (!match) continue
+        const key = match[1].toLowerCase()
+        let value = match[2].trim()
 
-          // Handle different data types
-          if (value.startsWith("[") && value.endsWith("]")) {
-            // Array
-            value = value
-              .slice(1, -1)
-              .split(",")
-              .map((item) => item.trim().replace(/"/g, ""))
-          } else if (value === "true" || value === "false") {
-            // Boolean
-            value = value === "true"
-          } else if (!isNaN(Number(value))) {
-            // Number
-            value = Number(value)
-          } else {
-            // String - remove quotes
-            value = value.replace(/^"(.*)"$/, "$1")
+        if (value === "|" || value === ">") {
+          const captured: string[] = []
+          let j = i + 1
+          while (j < lines.length && (lines[j].startsWith(" ") || lines[j].startsWith("\t"))) {
+            captured.push(lines[j].replace(/^\s+/, ""))
+            j++
           }
-
-          metadata[key] = value
+          metadata[key] = value === "|" ? captured.join("\n") : captured.join(" ")
+          i = j - 1
+          continue
         }
-      })
+
+        if (value === "") {
+          const arr: string[] = []
+          let j = i + 1
+          while (j < lines.length && lines[j].trim().startsWith("- ")) {
+            arr.push(lines[j].trim().slice(2).replace(/^"(.*)"$/, "$1"))
+            j++
+          }
+          if (arr.length > 0) {
+            metadata[key] = arr
+            i = j - 1
+            continue
+          }
+        }
+
+        if (value.startsWith("[") && value.endsWith("]")) {
+          value = value
+            .slice(1, -1)
+            .split(",")
+            .map((item) => item.trim().replace(/"/g, ""))
+        } else if (value === "true" || value === "false") {
+          value = value === "true"
+        } else if (!isNaN(Number(value))) {
+          value = Number(value)
+        } else {
+          value = value.replace(/^"(.*)"$/, "$1")
+        }
+
+        metadata[key] = value
+      }
+
+      if (!metadata.title) {
+        const h1 = body.match(/^\s*#\s+(.*)$/m)
+        if (h1) metadata.title = h1[1].trim()
+      }
 
       const slug =
         metadata.title
           ?.toLowerCase()
           .replace(/[^a-z0-9]+/g, "-")
           .replace(/(^-|-$)/g, "") || "untitled"
+
+      if (metadata.authors && typeof metadata.authors === "string") metadata.authors = [metadata.authors]
+      if (metadata.tags && typeof metadata.tags === "string") metadata.tags = [metadata.tags]
 
       return {
         slug,
@@ -223,10 +263,11 @@ class GitHubService {
         code_url: metadata.code_url || "",
         dataset_url: metadata.dataset_url || "",
         thumbnail: metadata.thumbnail || "",
-        readingTime: Math.ceil(body.split(" ").length / 200),
+        readingTime: Math.ceil(body.split(/\s+/).length / 200),
         url: `/publications/${slug}`,
         body: { code: body },
-        github_link: metadata.github_link || this.generateArticleLink(metadata.title || "untitled"),
+        github_link:
+          metadata.github_link || `https://github.com/${this.config.owner}/${this.config.repo}/blob/main/${this.getArticlePath(slug, "published")}`,
       }
     } catch (error) {
       console.error("Error parsing markdown article:", error)
@@ -240,7 +281,7 @@ class GitHubService {
       .replace(/[^a-z0-9]+/g, "-")
       .replace(/(^-|-$)/g, "")
 
-    return `https://github.com/${this.config.owner}/${this.config.repo}/articles/${slug}`
+    return `https://github.com/${this.config.owner}/${this.config.repo}/blob/main/${this.getArticlePath(slug, "published")}`
   }
 
   getArticlePath(slug: string, status: "draft" | "published"): string {
