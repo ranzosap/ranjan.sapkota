@@ -17,7 +17,7 @@
 
     
 
-![Video](/uploads/21fcc555-36a9-4cd1-a88f-e813243b7e1e-peter.mp4 "width=100%")
+https://www.youtube.com/watch?v=H-ExNmHo2xI&list=RDH-ExNmHo2xI&start_radio=1
 
 
 Various machine vision technologies have been applied using various types of object detection algorithms in agriculture automation for more than a decade. Nilsback and
