@@ -36,4 +36,10 @@ using the traditional image processing methods such as
 morphological image processing and various segmentation
 techniques including Otsu’s method, and classifying the
 flower color group with contour shapes using k-mean
+
+![Image (1)](blob:http://localhost:3000/d2d32816-f5ff-4e6f-a6c5-efe72e38a5ca)
+
+
+
+
     
