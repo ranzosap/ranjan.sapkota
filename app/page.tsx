@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { ArrowRight, BookOpen, Users, Award } from "lucide-react"
+import { getPublishedArticlesWithSync, getPublishedArticles, type Article } from "@/lib/mock-data"
 
 function useAnimatedCounter(end: number, duration = 2000) {
   const [count, setCount] = useState(0)
@@ -43,6 +44,7 @@ export default function HomePage() {
    const publicationsCounter = useAnimatedCounter(30)
   const citationsCounter = useAnimatedCounter(1000)
   const awardsCounter = useAnimatedCounter(8)
+  const [latestArticles, setLatestArticles] = useState<Article[]>([])
 
   useEffect(() => {
     observerRef.current = new IntersectionObserver(
@@ -71,6 +73,35 @@ export default function HomePage() {
       }
     }
   }, [publicationsCounter, citationsCounter, awardsCounter])
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const articles = await getPublishedArticlesWithSync()
+        const sorted = articles
+          .slice()
+          .sort((a, b) => {
+            if (a.year !== b.year) return b.year - a.year
+            const am = a.month || 12
+            const bm = b.month || 12
+            return bm - am
+          })
+        setLatestArticles(sorted.slice(0, 4))
+      } catch {
+        const fallback = getPublishedArticles()
+        const sorted = fallback
+          .slice()
+          .sort((a, b) => {
+            if (a.year !== b.year) return b.year - a.year
+            const am = a.month || 12
+            const bm = b.month || 12
+            return bm - am
+          })
+        setLatestArticles(sorted.slice(0, 4))
+      }
+    }
+    load()
+  }, [])
 
   return (
     <div className="container py-8 md:py-12 space-y-16">
@@ -174,109 +205,28 @@ export default function HomePage() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <Card className="backdrop-blur-md bg-card/70 border-border/30 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
-            <CardHeader>
-              <CardTitle className="text-lg font-[var(--font-heading)]">
-                Towards reducing chemical usage for weed control in agriculture using UAS imagery analysis
-              </CardTitle>
-              <CardDescription>Scientific Reports, Nature Portfolio • 2023</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                This research demonstrates a 26% reduction in chemical usage for weed control through advanced computer
-                vision techniques and UAS imagery analysis in agricultural row crop settings.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="outline" className="backdrop-blur-sm bg-background/50">
-                  Precision Agriculture
-                </Badge>
-                <Badge variant="outline" className="backdrop-blur-sm bg-background/50">
-                  Computer Vision
-                </Badge>
-                <Badge variant="outline" className="backdrop-blur-sm bg-background/50">
-                  UAS
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="backdrop-blur-md bg-card/70 border-border/30 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
-            <CardHeader>
-              <CardTitle className="text-lg font-[var(--font-heading)]">
-                Immature green apple detection and sizing in commercial orchards using YOLOv8
-              </CardTitle>
-              <CardDescription>IEEE Access • 2024</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                Advanced object detection system for robotic fruit thinning applications in commercial apple orchards
-                using state-of-the-art YOLO architecture and shape fitting techniques.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="outline" className="backdrop-blur-sm bg-background/50">
-                  Agricultural Robotics
-                </Badge>
-                <Badge variant="outline" className="backdrop-blur-sm bg-background/50">
-                  YOLO
-                </Badge>
-                <Badge variant="outline" className="backdrop-blur-sm bg-background/50">
-                  Fruit Detection
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="backdrop-blur-md bg-card/70 border-border/30 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
-            <CardHeader>
-              <CardTitle className="text-lg font-[var(--font-heading)]">
-                Comparing YOLOv8 and Mask R-CNN for instance segmentation in complex orchard environments
-              </CardTitle>
-              <CardDescription>Artificial Intelligence in Agriculture • 2024</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                Comprehensive comparison of deep learning architectures for object detection and segmentation in
-                challenging agricultural environments with varying lighting conditions.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="outline" className="backdrop-blur-sm bg-background/50">
-                  Deep Learning
-                </Badge>
-                <Badge variant="outline" className="backdrop-blur-sm bg-background/50">
-                  Instance Segmentation
-                </Badge>
-                <Badge variant="outline" className="backdrop-blur-sm bg-background/50">
-                  Orchard Automation
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="backdrop-blur-md bg-card/70 border-border/30 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
-            <CardHeader>
-              <CardTitle className="text-lg font-[var(--font-heading)]">
-                A vision-based robotic system for precision pollination of apples
-              </CardTitle>
-              <CardDescription>Computers and Electronics in Agriculture • 2025</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground mb-4">
-                Novel robotic pollination system combining computer vision and precision robotics for automated apple
-                flower pollination in commercial orchards.
-              </p>
-              <div className="flex flex-wrap gap-2">
-                <Badge variant="outline" className="backdrop-blur-sm bg-background/50">
-                  Robotic Pollination
-                </Badge>
-                <Badge variant="outline" className="backdrop-blur-sm bg-background/50">
-                  Machine Vision
-                </Badge>
-                <Badge variant="outline" className="backdrop-blur-sm bg-background/50">
-                  Precision Robotics
-                </Badge>
-              </div>
-            </CardContent>
-          </Card>
+          {latestArticles.map((a) => (
+            <Card key={a.slug} className="backdrop-blur-md bg-card/70 border-border/30 shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300">
+              <CardHeader>
+                <CardTitle className="text-lg font-[var(--font-heading)]">
+                  <Link href={a.url}>{a.title}</Link>
+                </CardTitle>
+                <CardDescription>{a.publication_venue} • {a.year}</CardDescription>
+              </CardHeader>
+              <CardContent>
+                {a.abstract && (
+                  <p className="text-sm text-muted-foreground mb-4 line-clamp-4">{a.abstract}</p>
+                )}
+                {a.tags && a.tags.length > 0 && (
+                  <div className="flex flex-wrap gap-2">
+                    {a.tags.slice(0,3).map((t) => (
+                      <Badge key={t} variant="outline" className="backdrop-blur-sm bg-background/50">{t}</Badge>
+                    ))}
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          ))}
         </div>
 
         <div className="text-center">
